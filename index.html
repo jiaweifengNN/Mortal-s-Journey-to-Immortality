@@ -139,33 +139,15 @@ section{position:relative;z-index:2;padding:90px 20px 60px;max-width:1060px;marg
 .search input::placeholder{color:var(--faint)}
 .count-note{color:var(--faint);font-size:12px;letter-spacing:2px}
 
-.timeline{position:relative;margin-top:10px;padding-left:34px}
-.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;
-  background:linear-gradient(180deg,transparent,var(--gold-dim) 6%,var(--gold-dim) 94%,transparent)}
-.month-mark{position:relative;margin:34px 0 14px;font-family:var(--font-kai);color:var(--qing);
-  font-size:16px;letter-spacing:4px;display:flex;align-items:center;gap:12px}
-.month-mark::before{content:"";position:absolute;left:-34px;top:50%;width:10px;height:10px;transform:translate(-2px,-50%) rotate(45deg);
-  background:var(--ink2);border:2px solid var(--qing)}
-.month-mark .mstats{font-size:12px;color:var(--faint);letter-spacing:1px;font-family:var(--font-song)}
-.entry{position:relative;margin-bottom:14px;background:linear-gradient(180deg,var(--ink3),var(--ink2));
-  border:1px solid rgba(91,131,151,.18);border-radius:10px;padding:14px 18px;transition:.3s}
-.entry::before{content:"";position:absolute;left:-31px;top:20px;width:8px;height:8px;border-radius:50%;
-  background:var(--gold);box-shadow:0 0 8px rgba(200,163,95,.6)}
-.entry:hover{border-color:rgba(200,163,95,.45);transform:translateX(4px);box-shadow:0 4px 18px rgba(0,0,0,.35)}
-.entry.empty{opacity:.45}
-.entry.empty:hover{transform:none}
-.entry .d{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.entry .d .date{font-family:var(--font-kai);color:var(--gold-hi);font-size:15px;letter-spacing:1px}
-.entry .d .wd{color:var(--faint);font-size:12px}
-.entry .d .bigan{margin-left:auto;font-family:var(--font-kai);font-size:12px;color:var(--cinnabar-hi);
-  border:1px solid rgba(179,64,46,.45);border-radius:4px;padding:1px 8px;letter-spacing:2px}
-.entry .txt{margin-top:6px;font-size:14.5px;color:var(--moon);word-break:break-word}
-.entry .foods{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
-.entry .foods .fl{font-size:12px;color:var(--qing);letter-spacing:2px;font-family:var(--font-kai)}
-.entry .foods .fchip{font-size:12.5px;color:var(--gold-hi);background:rgba(200,163,95,.1);
-  border:1px solid rgba(200,163,95,.3);padding:2px 10px;border-radius:999px}
-.entry .route{margin-top:8px;font-size:12.5px;color:var(--dim)}
-.entry .route::before{content:"遁光 · ";color:var(--qing);font-family:var(--font-kai)}
+/* ===== 修行日志 · 台账 ===== */
+td.ev{color:var(--moon)}
+td.foodcell{color:var(--gold-hi)}
+td.routecell{color:var(--dim)}
+.fdot{color:var(--faint);margin:0 1px}
+.wd2{color:var(--faint);font-size:11px;margin-left:6px;font-family:var(--font-song)}
+tr.emptylog td{opacity:.55}
+tr.fromlog td.name{color:#a9c8d6}
+.badge.b-log{color:#dceef2;background:rgba(91,131,151,.28);border:1px solid rgba(91,131,151,.55)}
 
 /* ===== 灵膳录 · 仙籍台账 ===== */
 .food-tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
@@ -235,9 +217,6 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
 @media (max-width:640px){
   nav{padding:0 14px;gap:10px} nav .brand small{display:none}
   nav .links a{padding:6px 8px;font-size:13px;letter-spacing:0}
-  .timeline{padding-left:26px}
-  .entry::before{left:-23px}
-  .month-mark::before{left:-26px}
 }
 </style>
 </head>
@@ -295,7 +274,9 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
     </div>
     <span class="count-note" id="logCount"></span>
   </div>
-  <div class="timeline" id="timeline"></div>
+  <div class="food-wrap reveal"><div class="food-scroll">
+    <table class="food-table"><thead id="logHead"></thead><tbody id="timeline"></tbody></table>
+  </div></div>
 </section>
 
 <!-- ============ 卷二 · 灵膳录 ============ -->
@@ -303,7 +284,8 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
   <div class="chapter-head reveal">
     <span class="no">卷二</span><h2>灵膳录</h2><span class="en">SPIRIT FEAST · FOOD ATLAS</span>
   </div>
-  <p class="chapter-desc reveal">坊市之间，凡尘烟火最抚仙心。此录收录<b id="foodDescN"></b>，另有机缘后备若干。</p>
+  <p class="chapter-desc reveal">坊市之间，凡尘烟火最抚仙心。此录合并<b id="foodDescN"></b>，按亲临之日排成时间线（修行日志所记灵膳已同步至此）。</p>
+  <div class="food-tabs reveal" id="srcTabs"></div>
   <div class="food-tabs reveal" id="foodTabs"></div>
   <div class="food-tools reveal">
     <div class="search">
@@ -387,7 +369,7 @@ logs.forEach(function(l){ if(l.f&&l.f.length)nFoodLog++; if(l.e)nEv++; else nEmp
     return '<div class="card"><div class="num">'+it[1]+'</div><div class="lab">'+it[0]+'</div><div class="tip">'+it[2]+'</div></div>';
   }).join('');
   $('#logDescN').textContent='凡两载修行，共 '+logs.length+' 篇日志。';
-  $('#foodDescN').textContent='曾亲临之仙府 '+eaten.length+' 家';
+  $('#foodDescN').textContent='探店仙府 '+eaten.length+' 家';
 })();
 
 /* ---------- 境界阶梯 ---------- */
@@ -411,36 +393,39 @@ logs.forEach(function(l){ if(l.f&&l.f.length)nFoodLog++; if(l.e)nEv++; else nEmp
   $('#rbarNote').textContent='丙午年筑基 · 已历 '+pct+' 成（日志至 '+last+'）';
 })();
 
-/* ---------- 修行日志渲染 ---------- */
+/* ---------- 修行日志渲染（Excel式台账 · 按月分隔） ---------- */
 var curYear='all', curQ='';
 function renderLogs(){
-  var box=$('#timeline'), html='', lastMonth='', shown=0;
+  var head=$('#logHead'), body=$('#timeline');
   var qs=curQ.trim().toLowerCase();
+  var list=[];
   logs.forEach(function(l){
     if(curYear!=='all' && l.d.slice(0,4)!==curYear)return;
     var hay=(l.d+' '+(l.e||'')+' '+(l.f||[]).join(' ')+' '+(l.r||'')).toLowerCase();
     if(qs && hay.indexOf(qs)<0)return;
+    list.push(l);
+  });
+  head.innerHTML='<tr><th class="rownum">#</th><th>日期</th><th>事件</th><th>吃了什么</th><th>路线</th></tr>';
+  var html='', lastMonth='', no=0;
+  list.forEach(function(l){
     var month=l.d.slice(0,7);
     if(month!==lastMonth){
-      if(html)html+='<div class="hr-gold"></div>';
-      var cnt=logs.filter(function(x){return x.d.slice(0,7)===month}).length;
-      html+='<div class="month-mark">'+GANZHI[month.slice(0,4)]+'年 '+month.slice(5,7)+'月 <span class="mstats">此月录 '+cnt+' 篇</span></div>';
+      var cnt=list.filter(function(x){return x.d.slice(0,7)===month}).length;
+      html+='<tr class="divider"><td colspan="5">'+(GANZHI[month.slice(0,4)]||'')+'年 '+month.slice(5,7)+'月'
+        +' <span style="opacity:.55;letter-spacing:1px;font-size:12px">（录 '+cnt+' 篇）</span></td></tr>';
       lastMonth=month;
     }
-    var f=fmtDate(l.d), hasEv=!!(l.e&&l.e.trim()), hasF=l.f&&l.f.length;
-    html+='<div class="entry'+(hasEv||hasF?'':' empty')+'">'
-      +'<div class="d"><span class="date">'+f.text+'</span><span class="wd">'+f.wd+'</span>'
-      +(hasEv?'':'<span class="bigan">闭关</span>')+'</div>';
-    if(hasEv)html+='<div class="txt">'+esc(l.e)+'</div>';
-    else if(hasF)html+='<div class="txt" style="color:var(--dim)">此日未记事，唯有灵膳。</div>';
-    else html+='<div class="txt" style="color:var(--faint)">此日闭关，未着一字。</div>';
-    if(hasF)html+='<div class="foods"><span class="fl">灵膳</span>'+l.f.map(function(x){return '<span class="fchip">'+esc(x)+'</span>'}).join('')+'</div>';
-    if(l.r&&l.r.trim())html+='<div class="route">'+esc(l.r)+'</div>';
-    html+='</div>';
-    shown++;
+    no++;
+    var f=fmtDate(l.d), hasEv=!!(l.e&&l.e.trim()), hasF=l.f&&l.f.length, hasR=!!(l.r&&l.r.trim());
+    html+='<tr'+((!hasEv&&!hasF)?' class="emptylog"':'')+'>'
+      +'<td class="rownum">'+no+'</td>'
+      +'<td class="date">'+l.d+'<span class="wd2">'+f.wd+'</span></td>'
+      +'<td class="ev">'+(hasEv?esc(l.e):'<span class="na">此日闭关，未着一字</span>')+'</td>'
+      +'<td class="foodcell">'+(hasF?l.f.map(esc).join('<span class="fdot">、</span>'):'<span class="na">—</span>')+'</td>'
+      +'<td class="routecell">'+(hasR?esc(l.r):'<span class="na">—</span>')+'</td></tr>';
   });
-  box.innerHTML=html||'<div class="food-empty">神识所及 · 未见此段因果</div>';
-  $('#logCount').textContent='示 '+shown+' 篇';
+  body.innerHTML=html||'<tr><td colspan="5" class="food-empty">神识所及 · 未见此段因果</td></tr>';
+  $('#logCount').textContent='示 '+list.length+' 篇';
   observeReveals();
 }
 $$('.log-tools .chip').forEach(function(c){
@@ -458,7 +443,7 @@ function regionOf(s){
   if(s==='武昌'||s==='汉口'||s==='汉阳'||s==='异地')return s;
   return '未详';
 }
-var curReg='全部', curFQ='';
+var curReg='全部', curFQ='', curSrc='all';
 function badge(t){
   if(t==='吃过多次')return '<span class="badge b-multi">吃过多次</span>';
   if(t==='吃过一次')return '<span class="badge b-once">吃过一次</span>';
@@ -467,60 +452,86 @@ function badge(t){
   return '<span class="badge b-once">'+esc(t||'—')+'</span>';
 }
 function td(v,cls){return '<td'+(cls?' class="'+cls+'"':'')+'>'+((v===''||v==null)?'<span class="na">—</span>':esc(v))+'</td>'}
+/* 自修行日志同步灵膳：同店同日已在探店录中的不再重复 */
+var eatenDateIdx={};
+eaten.forEach(function(s){if(s.date&&s.n)eatenDateIdx[s.n+'|'+s.date]=1});
+function logFoodRows(){
+  var out=[];
+  logs.forEach(function(l){
+    if(!l.f||!l.f.length)return;
+    var names=l.f.filter(function(f){return !eatenDateIdx[f+'|'+l.d]});
+    if(names.length)out.push({n:names.join('、'),ev:l.e,d:l.d});
+  });
+  return out;
+}
+var LOGFOOD=logFoodRows();
 function renderFood(){
   var qs=curFQ.trim().toLowerCase();
   var isBk=curReg==='后备名单';
   var head=$('#foodHead'), body=$('#foodGrid');
-  var list=[];
-  (isBk?backup:eaten).forEach(function(s){
-    if(!isBk&&curReg!=='全部'&&regionOf(s.reg)!==curReg)return;
-    if(qs&&(s.n+' '+(s.note||'')+' '+(s.area||'')+' '+(s.t||'')+' '+(s.reg||'')+' '+(s.s||'')).toLowerCase().indexOf(qs)<0)return;
-    list.push(s);
-  });
-  var html='';
+  var showMap=curSrc!=='log', showLog=!isBk&&curReg==='全部'&&curSrc!=='map';
+  head.innerHTML='<tr><th class="rownum">#</th><th>店名 / 灵膳</th><th>类型</th><th>品阶</th><th>坊市</th><th>坐落</th><th>仙厨心得</th><th>亲临之日</th></tr>';
+  function hit(){
+    if(!qs)return true;
+    return Array.prototype.slice.call(arguments).join(' ').toLowerCase().indexOf(qs)>=0;
+  }
+  var dated=[], undated=[];
+  function addMap(s){
+    if(s.date)dated.push({k:'m',date:s.date,s:s}); else undated.push({k:'m',s:s});
+  }
   if(isBk){
-    head.innerHTML='<tr><th class="rownum">#</th><th>店名</th><th>类型</th><th>状态</th><th>坊市</th><th>坐落</th><th>备注</th></tr>';
-    list.forEach(function(s,i){
-      var evil=s.s&&s.s.indexOf('避雷')>=0;
-      html+='<tr'+(evil?' class="evil"':'')+'>'
-        +'<td class="rownum">'+(i+1)+'</td>'
-        +'<td class="name">'+esc(s.n)+'</td>'
-        +td(s.t)
-        +'<td>'+badge(s.s)+'</td>'
-        +td(s.reg)+td(s.area)+td(s.note,'note')+'</tr>';
-    });
+    if(showMap)backup.forEach(function(s){ if(hit(s.n,s.note,s.area,s.t,s.reg,s.s))addMap(s) });
   }else{
-    head.innerHTML='<tr><th class="rownum">#</th><th>店名</th><th>类型</th><th>品阶</th><th>坊市</th><th>坐落</th><th>仙厨心得</th><th>亲临之日</th></tr>';
-    var dated=list.filter(function(s){return s.date}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0});
-    var undated=list.filter(function(s){return !s.date});
-    var lastYear='', no=0;
-    function row(s){
-      var multi=s.s==='吃过多次';
-      return '<tr'+(multi?' class="multi"':'')+'>'
-        +'<td class="rownum">'+(++no)+'</td>'
-        +'<td class="name">'+esc(s.n)+(multi?'<span class="star">★</span>':'')+'</td>'
-        +td(s.t)
-        +'<td>'+badge(s.s)+'</td>'
-        +td(regionOf(s.reg))
-        +td(s.area)+td(s.note,'note')
-        +'<td class="date">'+s.date+'</td></tr>';
-    }
-    dated.forEach(function(s){
-      var y=s.date.slice(0,4);
-      if(y!==lastYear){
-        var cnt=dated.filter(function(x){return x.date.slice(0,4)===y}).length;
-        html+='<tr class="divider"><td colspan="8">'+(GANZHI[y]||'')+'年 · '+y+' <span style="opacity:.55;letter-spacing:1px;font-size:12px">（亲临 '+cnt+' 家）</span></td></tr>';
-        lastYear=y;
-      }
-      html+=row(s);
+    if(showMap)eaten.forEach(function(s){
+      if(curReg!=='全部'&&regionOf(s.reg)!==curReg)return;
+      if(!hit(s.n,s.note,s.area,s.t,s.reg,s.s))return;
+      addMap(s);
     });
-    if(undated.length){
-      html+='<tr class="divider"><td colspan="8">机缘未至 · 未定之日 <span style="opacity:.55;letter-spacing:1px;font-size:12px">（'+undated.length+' 家）</span></td></tr>';
-      undated.forEach(function(s){html+=row(s)});
+    if(showLog)LOGFOOD.forEach(function(g){
+      if(!hit(g.n,g.ev,g.d))return;
+      dated.push({k:'l',date:g.d,g:g});
+    });
+  }
+  dated.sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0});
+  var html='', lastYear='', no=0;
+  function mapRow(s){
+    var multi=s.s==='吃过多次', evil=s.s&&s.s.indexOf('避雷')>=0;
+    var cls=multi?' class="multi"':(evil?' class="evil"':'');
+    return '<tr'+cls+'>'
+      +'<td class="rownum">'+(++no)+'</td>'
+      +'<td class="name">'+esc(s.n)+(multi?'<span class="star">★</span>':'')+'</td>'
+      +td(s.t)
+      +'<td>'+badge(s.s)+'</td>'
+      +td(isBk?s.reg:regionOf(s.reg))
+      +td(s.area)+td(s.note,'note')
+      +'<td class="date">'+(s.date||'<span class="na">—</span>')+'</td></tr>';
+  }
+  function logRow(g){
+    return '<tr class="fromlog">'
+      +'<td class="rownum">'+(++no)+'</td>'
+      +'<td class="name">'+esc(g.n)+'</td>'
+      +'<td><span class="na">—</span></td>'
+      +'<td><span class="badge b-log">日志灵膳</span></td>'
+      +'<td><span class="na">—</span></td>'
+      +'<td><span class="na">—</span></td>'
+      +td(g.ev,'note')
+      +'<td class="date">'+g.d+'</td></tr>';
+  }
+  dated.forEach(function(it){
+    var y=it.date.slice(0,4);
+    if(y!==lastYear){
+      var cnt=dated.filter(function(x){return x.date.slice(0,4)===y}).length;
+      html+='<tr class="divider"><td colspan="8">'+(GANZHI[y]||'')+'年 · '+y+' <span style="opacity:.55;letter-spacing:1px;font-size:12px">（'+cnt+' 席）</span></td></tr>';
+      lastYear=y;
     }
+    html+=it.k==='m'?mapRow(it.s):logRow(it.g);
+  });
+  if(undated.length){
+    html+='<tr class="divider"><td colspan="8">'+(isBk?'后备名单 · 机缘与凶地':'机缘未至 · 未定之日')+' <span style="opacity:.55;letter-spacing:1px;font-size:12px">（'+undated.length+' 家）</span></td></tr>';
+    undated.forEach(function(it){html+=mapRow(it.s)});
   }
   body.innerHTML=html||'<tr><td colspan="8" class="food-empty">此坊市中 · 未见所寻仙府</td></tr>';
-  $('#foodCount').textContent='示 '+list.length+' 家';
+  $('#foodCount').textContent='示 '+(dated.length+undated.length)+' 席';
   observeReveals();
 }
 (function(){
@@ -537,6 +548,20 @@ function renderFood(){
       c.classList.add('on');curReg=c.getAttribute('data-reg');renderFood();
     });
   });
+})();
+(function(){
+  var srcs=[['all','全部来源'],['map','探店录 · 美食地图'],['log','修行日志 · 灵膳']];
+  var cnts=[eaten.length+LOGFOOD.length, eaten.length, LOGFOOD.length];
+  $('#srcTabs').innerHTML=srcs.map(function(x,i){
+    return '<div class="chip'+(i===0?' on':'')+'" data-src="'+x[0]+'">'+x[1]+' <span style="opacity:.6;font-size:11px">'+cnts[i]+'</span></div>';
+  }).join('');
+  $$('#srcTabs .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      $$('#srcTabs .chip').forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');curSrc=c.getAttribute('data-src');renderFood();
+    });
+  });
+  $('#foodDescN').textContent='探店仙府 '+eaten.length+' 家、修行日志灵膳 '+LOGFOOD.length+' 席';
 })();
 var deb2;
 $('#foodSearch').addEventListener('input',function(e){curFQ=e.target.value;clearTimeout(deb2);deb2=setTimeout(renderFood,160)});
