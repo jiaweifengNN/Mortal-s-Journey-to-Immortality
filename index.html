@@ -167,32 +167,38 @@ section{position:relative;z-index:2;padding:90px 20px 60px;max-width:1060px;marg
 .entry .route{margin-top:8px;font-size:12.5px;color:var(--dim)}
 .entry .route::before{content:"遁光 · ";color:var(--qing);font-family:var(--font-kai)}
 
-/* ===== 灵膳录 ===== */
+/* ===== 灵膳录 · 仙籍台账 ===== */
 .food-tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
 .food-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:24px}
-.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-.shop{position:relative;background:linear-gradient(180deg,var(--ink3),var(--ink2));border-radius:10px;
-  padding:16px 16px 14px;border:1px solid rgba(91,131,151,.18);transition:.3s;overflow:hidden}
-.shop:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
-.shop::after{content:"";position:absolute;top:0;right:0;width:52px;height:52px;
-  background:radial-gradient(circle at top right,rgba(200,163,95,.12),transparent 70%)}
-.shop .top{display:flex;align-items:flex-start;gap:10px}
-.shop .name{font-family:var(--font-kai);font-size:18px;color:var(--moon);letter-spacing:1px;flex:1}
-.shop .pin{flex:none;font-family:var(--font-kai);font-size:11px;letter-spacing:2px;padding:3px 8px;border-radius:4px;transform:translateY(2px)}
-.pin.gold{color:#1a1408;background:linear-gradient(135deg,var(--gold-hi),var(--gold))}
-.pin.silver{color:#dfe6df;background:rgba(91,131,151,.35);border:1px solid rgba(91,131,151,.5)}
-.pin.fate{color:var(--qing);border:1px dashed var(--qing);background:rgba(91,131,151,.08)}
-.pin.evil{color:#f3d9cf;background:linear-gradient(135deg,#c0503a,#8e2f1f)}
-.shop .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px;color:var(--faint)}
-.shop .meta .m{background:rgba(91,131,151,.12);border:1px solid rgba(91,131,151,.22);padding:1px 8px;border-radius:4px}
-.shop .note{margin-top:10px;font-size:13.5px;color:var(--dim);word-break:break-word}
-.shop.gold-b{border-color:rgba(200,163,95,.4)}
-.shop.gold-b::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:linear-gradient(180deg,var(--gold-hi),transparent)}
-.shop.evil-b{border-color:rgba(179,64,46,.45)}
-.shop.evil-b::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:linear-gradient(180deg,var(--cinnabar-hi),transparent)}
-.shop .last{margin-top:10px;font-size:11.5px;color:var(--faint);letter-spacing:1px}
+.food-wrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  background:linear-gradient(180deg,var(--ink3),var(--ink2));box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.food-scroll{overflow-x:auto}
+table.food-table{width:100%;border-collapse:collapse;min-width:920px;font-size:13.5px}
+.food-table thead th{font-family:var(--font-kai);font-weight:normal;color:var(--gold-hi);letter-spacing:3px;
+  font-size:14px;text-align:left;padding:13px 14px;background:rgba(200,163,95,.07);
+  border-bottom:1px solid rgba(200,163,95,.35);white-space:nowrap}
+.food-table thead th.rownum{width:40px;text-align:center;color:var(--gold)}
+.food-table td{padding:11px 14px;border-bottom:1px solid rgba(91,131,151,.13);vertical-align:top;color:var(--moon)}
+.food-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.014)}
+.food-table tbody tr:hover td{background:rgba(200,163,95,.06)}
+.food-table tr:last-child td{border-bottom:none}
+td.rownum{text-align:center;color:var(--faint);font-size:12px;font-family:var(--font-kai)}
+td.name{font-family:var(--font-kai);font-size:15.5px;letter-spacing:1px;white-space:nowrap}
+tr.multi td.name{color:var(--gold-hi)}
+td.name .star{color:var(--gold);font-size:12px;margin-left:4px}
+tr.evil td{background:rgba(179,64,46,.06)}
+tr.evil td.name{color:var(--cinnabar-hi)}
+td.date{font-family:var(--font-kai);color:var(--gold);white-space:nowrap;letter-spacing:1px}
+td.note{color:var(--dim);min-width:220px}
+td .na{color:var(--faint)}
+tr.divider td{background:rgba(200,163,95,.06);border-bottom:1px solid rgba(200,163,95,.25);
+  font-family:var(--font-kai);color:var(--qing);letter-spacing:5px;font-size:13px;padding:7px 14px}
+.badge{display:inline-block;font-family:var(--font-kai);font-size:12px;letter-spacing:2px;
+  padding:2px 10px;border-radius:4px;white-space:nowrap}
+.badge.b-multi{color:#1a1408;background:linear-gradient(135deg,var(--gold-hi),var(--gold));box-shadow:0 0 8px rgba(200,163,95,.3)}
+.badge.b-once{color:var(--moon);background:rgba(91,131,151,.22);border:1px solid rgba(91,131,151,.45)}
+.badge.b-plan{color:var(--qing);background:rgba(91,131,151,.08);border:1px dashed var(--qing)}
+.badge.b-evil{color:#f3d9cf;background:linear-gradient(135deg,#c0503a,#8e2f1f)}
 .food-empty{color:var(--faint);text-align:center;padding:60px 0;letter-spacing:4px;font-family:var(--font-kai)}
 
 /* ===== 肉身境 ===== */
@@ -306,7 +312,9 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
     </div>
     <span class="count-note" id="foodCount"></span>
   </div>
-  <div class="food-grid" id="foodGrid"></div>
+  <div class="food-wrap reveal"><div class="food-scroll">
+    <table class="food-table"><thead id="foodHead"></thead><tbody id="foodGrid"></tbody></table>
+  </div></div>
 </section>
 
 <!-- ============ 卷三 · 肉身境 ============ -->
@@ -358,7 +366,7 @@ function $(s){return document.querySelector(s)}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
 function esc(t){var d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
 var WD=['日','一','二','三','四','五','六'];
-var GANZHI={'2025':'乙巳','2026':'丙午'};
+var GANZHI={'2023':'癸卯','2024':'甲辰','2025':'乙巳','2026':'丙午'};
 function fmtDate(d){
   var p=d.split('-');return {y:p[0],m:+p[1],day:+p[2],
     text:p[0]+'年'+p[1]+'月'+p[2]+'日', wd:'星期'+WD[new Date(+p[0],+p[1]-1,+p[2]).getDay()]}
@@ -444,50 +452,80 @@ $$('.log-tools .chip').forEach(function(c){
 var deb;
 $('#logSearch').addEventListener('input',function(e){curQ=e.target.value;clearTimeout(deb);deb=setTimeout(renderLogs,160)});
 
-/* ---------- 灵膳录渲染 ---------- */
-var PIN={gold:['gold','上品 · 熟客'],silver:['silver','中品 · 一晤'],fate:['fate','机缘 · 未至'],evil:['evil','凶地 · 勿入']};
-function pinOf(s){
-  if(s==='吃过多次')return PIN.gold;
-  if(s==='吃过一次')return PIN.silver;
-  if(s==='计划去吃'||s==='还没吃但想吃')return PIN.fate;
-  if(s.indexOf('避雷')>=0)return PIN.evil;
-  return PIN.silver;
-}
+/* ---------- 灵膳录渲染（Excel式台账 · 时间线） ---------- */
 var regions=['全部','武昌','汉口','汉阳','异地','未详','后备名单'];
 function regionOf(s){
   if(s==='武昌'||s==='汉口'||s==='汉阳'||s==='异地')return s;
   return '未详';
 }
 var curReg='全部', curFQ='';
-function shopCard(s,isBackup){
-  var p=pinOf(s.s), reg=isBackup?'后备':(s.reg||'未详');
-  var pinCls=p[0], pinTxt=isBackup?(s.s.indexOf('避雷')>=0?'凶地 · 勿入':'仙缘 · 未至'):pinTxt;
-  var border=pinCls==='gold'?' gold-b':(pinCls==='evil'?' evil-b':'');
-  var metas=[reg]; if(s.area)metas.push(s.area); if(s.t)metas.push(s.t);
-  var dateTxt=isBackup?'':'<div class="last">'+(s.date?'亲临 · '+s.date:'亲临之日未录')+'</div>';
-  return '<div class="shop'+border+'"><div class="top"><div class="name">'+esc(s.n)+'</div>'
-    +'<div class="pin '+pinCls+'">'+pinTxt+'</div></div>'
-    +'<div class="meta">'+metas.map(function(m){return '<span class="m">'+esc(m)+'</span>'}).join('')+'</div>'
-    +(s.note?'<div class="note">'+esc(s.note)+'</div>':'')
-    +dateTxt+'</div>';
+function badge(t){
+  if(t==='吃过多次')return '<span class="badge b-multi">吃过多次</span>';
+  if(t==='吃过一次')return '<span class="badge b-once">吃过一次</span>';
+  if(t==='计划去吃'||t==='还没吃但想吃')return '<span class="badge b-plan">'+esc(t)+'</span>';
+  if(t&&t.indexOf('避雷')>=0)return '<span class="badge b-evil">避雷勿入</span>';
+  return '<span class="badge b-once">'+esc(t||'—')+'</span>';
 }
+function td(v,cls){return '<td'+(cls?' class="'+cls+'"':'')+'>'+((v===''||v==null)?'<span class="na">—</span>':esc(v))+'</td>'}
 function renderFood(){
   var qs=curFQ.trim().toLowerCase();
-  var list=[], all=eaten.map(function(s){var x=s;x._bk=0;return x}).concat(backup.map(function(s){var x=s;x._bk=1;return x}));
-  all.forEach(function(s){
-    var r=s._bk?'后备名单':regionOf(s.reg);
-    if(curReg!=='全部'&&curReg!==r)return;
-    if(qs&&(s.n+' '+(s.note||'')+' '+(s.area||'')+' '+(s.t||'')).toLowerCase().indexOf(qs)<0)return;
+  var isBk=curReg==='后备名单';
+  var head=$('#foodHead'), body=$('#foodGrid');
+  var list=[];
+  (isBk?backup:eaten).forEach(function(s){
+    if(!isBk&&curReg!=='全部'&&regionOf(s.reg)!==curReg)return;
+    if(qs&&(s.n+' '+(s.note||'')+' '+(s.area||'')+' '+(s.t||'')+' '+(s.reg||'')+' '+(s.s||'')).toLowerCase().indexOf(qs)<0)return;
     list.push(s);
   });
-  $('#foodGrid').innerHTML=list.length?list.map(function(s){return shopCard(s,s._bk)}).join('')
-    :'<div class="food-empty">此坊市中 · 未见所寻仙府</div>';
+  var html='';
+  if(isBk){
+    head.innerHTML='<tr><th class="rownum">#</th><th>店名</th><th>类型</th><th>状态</th><th>坊市</th><th>坐落</th><th>备注</th></tr>';
+    list.forEach(function(s,i){
+      var evil=s.s&&s.s.indexOf('避雷')>=0;
+      html+='<tr'+(evil?' class="evil"':'')+'>'
+        +'<td class="rownum">'+(i+1)+'</td>'
+        +'<td class="name">'+esc(s.n)+'</td>'
+        +td(s.t)
+        +'<td>'+badge(s.s)+'</td>'
+        +td(s.reg)+td(s.area)+td(s.note,'note')+'</tr>';
+    });
+  }else{
+    head.innerHTML='<tr><th class="rownum">#</th><th>店名</th><th>类型</th><th>品阶</th><th>坊市</th><th>坐落</th><th>仙厨心得</th><th>亲临之日</th></tr>';
+    var dated=list.filter(function(s){return s.date}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0});
+    var undated=list.filter(function(s){return !s.date});
+    var lastYear='', no=0;
+    function row(s){
+      var multi=s.s==='吃过多次';
+      return '<tr'+(multi?' class="multi"':'')+'>'
+        +'<td class="rownum">'+(++no)+'</td>'
+        +'<td class="name">'+esc(s.n)+(multi?'<span class="star">★</span>':'')+'</td>'
+        +td(s.t)
+        +'<td>'+badge(s.s)+'</td>'
+        +td(regionOf(s.reg))
+        +td(s.area)+td(s.note,'note')
+        +'<td class="date">'+s.date+'</td></tr>';
+    }
+    dated.forEach(function(s){
+      var y=s.date.slice(0,4);
+      if(y!==lastYear){
+        var cnt=dated.filter(function(x){return x.date.slice(0,4)===y}).length;
+        html+='<tr class="divider"><td colspan="8">'+(GANZHI[y]||'')+'年 · '+y+' <span style="opacity:.55;letter-spacing:1px;font-size:12px">（亲临 '+cnt+' 家）</span></td></tr>';
+        lastYear=y;
+      }
+      html+=row(s);
+    });
+    if(undated.length){
+      html+='<tr class="divider"><td colspan="8">机缘未至 · 未定之日 <span style="opacity:.55;letter-spacing:1px;font-size:12px">（'+undated.length+' 家）</span></td></tr>';
+      undated.forEach(function(s){html+=row(s)});
+    }
+  }
+  body.innerHTML=html||'<tr><td colspan="8" class="food-empty">此坊市中 · 未见所寻仙府</td></tr>';
   $('#foodCount').textContent='示 '+list.length+' 家';
   observeReveals();
 }
 (function(){
   var counts={};
-  var all=eaten.concat(backup);counts['全部']=all.length;
+  counts['全部']=eaten.length;
   eaten.forEach(function(s){var r=regionOf(s.reg);counts[r]=(counts[r]||0)+1});
   counts['后备名单']=backup.length;
   $('#foodTabs').innerHTML=regions.map(function(r){
