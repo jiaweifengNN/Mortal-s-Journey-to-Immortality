@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>凡人修仙传 · 吾之仙途</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23b3402e'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23f5efe0' font-family='KaiTi,serif'>仙</text></svg>">
-<script src="https://map.qq.com/api/gljs?v=1.exp"></script>
+<script async src="https://map.qq.com/api/gljs?v=1.exp&callback=__tmapReady"></script>
 <style>
 :root{
   --ink:#0a0e14; --ink2:#0e151d; --ink3:#131d27; --ink4:#182532;
@@ -867,7 +867,12 @@ renderLogs();
 renderFood();
 renderWants();
 renderPlaces();
-renderMap();
+/* 地图异步初始化，不阻塞页面渲染 */
+window.__tmapReady=function(){ renderMap(); };
+/* 如果腾讯地图脚本已加载（回调已触发），直接初始化 */
+if(window.TMap){ renderMap(); }
+/* 超时降级：8秒后仍未加载则显示离线提示 */
+setTimeout(function(){ if(!window.TMap){ document.getElementById('tmapFall').style.display='flex'; } },8000);
 })();
 </script>
 </body>
