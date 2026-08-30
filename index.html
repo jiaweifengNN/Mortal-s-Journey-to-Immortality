@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>凡人修仙传 · 吾之仙途</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23b3402e'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23f5efe0' font-family='KaiTi,serif'>仙</text></svg>">
+<style>
+:root{
+  --ink:#0a0e14; --ink2:#0e151d; --ink3:#131d27; --ink4:#182532;
+  --gold:#c8a35f; --gold-hi:#e8cd8f; --gold-dim:#8a7444;
+  --cinnabar:#b3402e; --cinnabar-hi:#d9664f;
+  --qing:#5b8397; --qing-dim:#2e4654;
+  --moon:#dfe6df; --dim:#8fa0a8; --faint:#5c6d76;
+  --font-kai:"STKaiti","KaiTi","楷体","BiauKai","DFKai-SB",serif;
+  --font-song:"Noto Serif SC","Source Han Serif SC","STSong","STZhongsong","SimSun",serif;
+  --line:rgba(200,163,95,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink); color:var(--moon); font-family:var(--font-song);
+  overflow-x:hidden; line-height:1.7;
+  background-image:
+    radial-gradient(1100px 500px at 50% -80px, rgba(91,131,151,.13), transparent 70%),
+    radial-gradient(900px 600px at 85% 115%, rgba(200,163,95,.07), transparent 70%),
+    radial-gradient(700px 500px at 8% 60%, rgba(91,131,151,.08), transparent 70%);
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
+::selection{background:rgba(200,163,95,.35)}
+a{color:inherit;text-decoration:none}
+
+/* ===== 灵气粒子 ===== */
+#qi{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+#qi span{position:absolute;bottom:-10px;border-radius:50%;background:var(--gold-hi);
+  box-shadow:0 0 8px 1px rgba(232,205,143,.5);opacity:0;animation:rise linear infinite}
+@keyframes rise{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  8%{opacity:var(--o,.5)}
+  82%{opacity:var(--o,.5)}
+  100%{transform:translateY(-108vh) translateX(var(--dx,20px));opacity:0}
+}
+
+/* ===== 导航 ===== */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:18px;
+  padding:0 28px;height:58px;background:rgba(10,14,20,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);font-family:var(--font-kai)}
+nav .mini-seal{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#c0503a,#8e2f1f);
+  display:flex;align-items:center;justify-content:center;color:#f5efe0;font-size:17px;transform:rotate(-4deg);
+  box-shadow:0 0 10px rgba(179,64,46,.4)}
+nav .brand{font-size:17px;letter-spacing:2px;color:var(--gold-hi)}
+nav .brand small{color:var(--faint);font-size:11px;letter-spacing:3px;margin-left:8px}
+nav .links{margin-left:auto;display:flex;gap:4px}
+nav .links a{padding:6px 14px;font-size:14px;color:var(--dim);border-radius:4px;letter-spacing:2px;transition:.25s}
+nav .links a:hover,nav .links a.act{color:var(--gold-hi);background:rgba(200,163,95,.08)}
+
+/* ===== 卷首 ===== */
+header{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:100px 20px 40px;z-index:2;overflow:hidden}
+.mountain{position:absolute;bottom:0;left:0;right:0;width:100%;height:34vh;pointer-events:none;opacity:.8}
+.hero-glow{position:absolute;top:26%;left:50%;transform:translate(-50%,-50%);width:640px;height:640px;
+  background:radial-gradient(circle,rgba(200,163,95,.10),transparent 62%);pointer-events:none}
+.h-title{font-family:var(--font-kai);font-size:clamp(44px,7.5vw,86px);letter-spacing:.12em;
+  background:linear-gradient(180deg,#f3e2b3 8%,var(--gold) 55%,#96773d 96%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 22px rgba(200,163,95,.25));position:relative}
+.h-sub{margin-top:14px;font-family:var(--font-kai);font-size:clamp(16px,2.4vw,22px);
+  letter-spacing:14px;text-indent:14px;color:var(--qing)}
+.h-era{margin-top:10px;color:var(--faint);font-size:13px;letter-spacing:6px}
+.h-era b{color:var(--gold);font-weight:normal}
+.seal{margin:30px auto 0;width:64px;height:64px;border-radius:10px;transform:rotate(-4deg);
+  background:linear-gradient(135deg,#c0503a,#8e2f1f);display:grid;grid-template-columns:1fr 1fr;
+  place-items:center;font-family:var(--font-kai);color:#f7ecd9;font-size:22px;line-height:1;
+  box-shadow:0 4px 18px rgba(179,64,46,.45),inset 0 0 12px rgba(0,0,0,.3);animation:sealbreath 5s ease-in-out infinite}
+@keyframes sealbreath{0%,100%{box-shadow:0 4px 18px rgba(179,64,46,.45),inset 0 0 12px rgba(0,0,0,.3)}
+  50%{box-shadow:0 4px 26px rgba(217,102,79,.6),inset 0 0 12px rgba(0,0,0,.3)}}
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--faint);
+  font-size:12px;letter-spacing:4px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+/* 玉牌统计 */
+.jade{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-top:54px;
+  width:min(880px,100%)}
+.jade .card{position:relative;background:linear-gradient(180deg,var(--ink3),var(--ink2));
+  border:1px solid var(--line);border-radius:10px;padding:20px 12px 16px;overflow:hidden}
+.jade .card::before{content:"";position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.jade .num{font-family:var(--font-kai);font-size:34px;color:var(--gold-hi);line-height:1.2}
+.jade .lab{color:var(--dim);font-size:13px;letter-spacing:3px;margin-top:4px;font-family:var(--font-kai)}
+.jade .tip{color:var(--faint);font-size:11px;margin-top:6px}
+
+/* 境界阶梯 */
+.realm{width:min(880px,100%);margin-top:34px;position:relative}
+.realm .path{display:flex;align-items:center;justify-content:center;gap:0}
+.realm .stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:190px}
+.realm .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--gold-dim);background:var(--ink2);z-index:1}
+.realm .stage.pass .dot{background:radial-gradient(circle,#e8cd8f,#c8a35f 70%);border-color:var(--gold);
+  box-shadow:0 0 14px rgba(232,205,143,.55)}
+.realm .stage.now .dot{background:radial-gradient(circle,#fff2d0,#e8cd8f 60%);border-color:var(--gold-hi);
+  box-shadow:0 0 22px rgba(232,205,143,.85);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 14px rgba(232,205,143,.6)}50%{box-shadow:0 0 26px rgba(232,205,143,.95)}}
+.realm .rname{font-family:var(--font-kai);font-size:17px;color:var(--dim);letter-spacing:2px}
+.realm .stage.pass .rname{color:var(--gold)}
+.realm .stage.now .rname{color:var(--gold-hi)}
+.realm .yr{font-size:12px;color:var(--faint);letter-spacing:2px}
+.realm .seg{flex:1;height:1px;max-width:130px;background:linear-gradient(90deg,var(--gold-dim),var(--line))}
+.realm .seg.lit{background:linear-gradient(90deg,var(--gold),var(--gold-hi));box-shadow:0 0 8px rgba(200,163,95,.4)}
+.realm .rbar{width:min(520px,92%);margin:18px auto 0;height:6px;border-radius:3px;background:var(--ink4);
+  border:1px solid var(--line);overflow:hidden}
+.realm .rbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-dim),var(--gold-hi));
+  border-radius:3px;transition:width 1.6s cubic-bezier(.2,.7,.2,1)}
+.realm .rnote{text-align:center;color:var(--faint);font-size:12px;margin-top:8px;letter-spacing:2px}
+
+/* ===== 章节通用 ===== */
+section{position:relative;z-index:2;padding:90px 20px 60px;max-width:1060px;margin:0 auto}
+.chapter-head{display:flex;align-items:baseline;gap:18px;margin-bottom:8px}
+.chapter-head .no{font-family:var(--font-kai);font-size:15px;color:var(--cinnabar-hi);letter-spacing:4px;
+  border:1px solid rgba(179,64,46,.5);padding:4px 10px;border-radius:4px;transform:translateY(-4px)}
+.chapter-head h2{font-family:var(--font-kai);font-size:clamp(26px,4vw,38px);letter-spacing:8px;color:var(--gold-hi)}
+.chapter-head .en{color:var(--faint);font-size:12px;letter-spacing:3px}
+.chapter-desc{color:var(--dim);font-size:14px;margin:6px 0 30px;letter-spacing:1px}
+.chapter-desc b{color:var(--gold);font-weight:normal}
+.hr-gold{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5;margin:26px 0}
+
+/* ===== 修行日志 ===== */
+.log-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:26px}
+.chip{font-family:var(--font-kai);font-size:14px;letter-spacing:2px;color:var(--dim);cursor:pointer;
+  padding:7px 16px;border:1px solid var(--line);border-radius:999px;background:var(--ink2);transition:.25s;user-select:none}
+.chip:hover{color:var(--gold-hi)}
+.chip.on{color:var(--ink);background:linear-gradient(135deg,var(--gold-hi),var(--gold));border-color:var(--gold-hi);
+  box-shadow:0 0 14px rgba(200,163,95,.35)}
+.search{flex:1;min-width:220px;display:flex;align-items:center;gap:10px;background:var(--ink2);
+  border:1px solid var(--line);border-radius:999px;padding:8px 18px;transition:.25s}
+.search:focus-within{border-color:var(--gold);box-shadow:0 0 12px rgba(200,163,95,.2)}
+.search svg{flex:none;opacity:.55}
+.search input{flex:1;background:none;border:none;outline:none;color:var(--moon);font-size:14px;
+  font-family:var(--font-song);letter-spacing:1px}
+.search input::placeholder{color:var(--faint)}
+.count-note{color:var(--faint);font-size:12px;letter-spacing:2px}
+
+.timeline{position:relative;margin-top:10px;padding-left:34px}
+.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,transparent,var(--gold-dim) 6%,var(--gold-dim) 94%,transparent)}
+.month-mark{position:relative;margin:34px 0 14px;font-family:var(--font-kai);color:var(--qing);
+  font-size:16px;letter-spacing:4px;display:flex;align-items:center;gap:12px}
+.month-mark::before{content:"";position:absolute;left:-34px;top:50%;width:10px;height:10px;transform:translate(-2px,-50%) rotate(45deg);
+  background:var(--ink2);border:2px solid var(--qing)}
+.month-mark .mstats{font-size:12px;color:var(--faint);letter-spacing:1px;font-family:var(--font-song)}
+.entry{position:relative;margin-bottom:14px;background:linear-gradient(180deg,var(--ink3),var(--ink2));
+  border:1px solid rgba(91,131,151,.18);border-radius:10px;padding:14px 18px;transition:.3s}
+.entry::before{content:"";position:absolute;left:-31px;top:20px;width:8px;height:8px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 8px rgba(200,163,95,.6)}
+.entry:hover{border-color:rgba(200,163,95,.45);transform:translateX(4px);box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.entry.empty{opacity:.45}
+.entry.empty:hover{transform:none}
+.entry .d{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.entry .d .date{font-family:var(--font-kai);color:var(--gold-hi);font-size:15px;letter-spacing:1px}
+.entry .d .wd{color:var(--faint);font-size:12px}
+.entry .d .bigan{margin-left:auto;font-family:var(--font-kai);font-size:12px;color:var(--cinnabar-hi);
+  border:1px solid rgba(179,64,46,.45);border-radius:4px;padding:1px 8px;letter-spacing:2px}
+.entry .txt{margin-top:6px;font-size:14.5px;color:var(--moon);word-break:break-word}
+.entry .foods{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.entry .foods .fl{font-size:12px;color:var(--qing);letter-spacing:2px;font-family:var(--font-kai)}
+.entry .foods .fchip{font-size:12.5px;color:var(--gold-hi);background:rgba(200,163,95,.1);
+  border:1px solid rgba(200,163,95,.3);padding:2px 10px;border-radius:999px}
+.entry .route{margin-top:8px;font-size:12.5px;color:var(--dim)}
+.entry .route::before{content:"遁光 · ";color:var(--qing);font-family:var(--font-kai)}
+
+/* ===== 灵膳录 ===== */
+.food-tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.food-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:24px}
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.shop{position:relative;background:linear-gradient(180deg,var(--ink3),var(--ink2));border-radius:10px;
+  padding:16px 16px 14px;border:1px solid rgba(91,131,151,.18);transition:.3s;overflow:hidden}
+.shop:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
+.shop::after{content:"";position:absolute;top:0;right:0;width:52px;height:52px;
+  background:radial-gradient(circle at top right,rgba(200,163,95,.12),transparent 70%)}
+.shop .top{display:flex;align-items:flex-start;gap:10px}
+.shop .name{font-family:var(--font-kai);font-size:18px;color:var(--moon);letter-spacing:1px;flex:1}
+.shop .pin{flex:none;font-family:var(--font-kai);font-size:11px;letter-spacing:2px;padding:3px 8px;border-radius:4px;transform:translateY(2px)}
+.pin.gold{color:#1a1408;background:linear-gradient(135deg,var(--gold-hi),var(--gold))}
+.pin.silver{color:#dfe6df;background:rgba(91,131,151,.35);border:1px solid rgba(91,131,151,.5)}
+.pin.fate{color:var(--qing);border:1px dashed var(--qing);background:rgba(91,131,151,.08)}
+.pin.evil{color:#f3d9cf;background:linear-gradient(135deg,#c0503a,#8e2f1f)}
+.shop .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px;color:var(--faint)}
+.shop .meta .m{background:rgba(91,131,151,.12);border:1px solid rgba(91,131,151,.22);padding:1px 8px;border-radius:4px}
+.shop .note{margin-top:10px;font-size:13.5px;color:var(--dim);word-break:break-word}
+.shop.gold-b{border-color:rgba(200,163,95,.4)}
+.shop.gold-b::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--gold-hi),transparent)}
+.shop.evil-b{border-color:rgba(179,64,46,.45)}
+.shop.evil-b::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--cinnabar-hi),transparent)}
+.shop .last{margin-top:10px;font-size:11.5px;color:var(--faint);letter-spacing:1px}
+.food-empty{color:var(--faint);text-align:center;padding:60px 0;letter-spacing:4px;font-family:var(--font-kai)}
+
+/* ===== 肉身境 ===== */
+.sealed{position:relative;text-align:center;padding:70px 20px;border:1px dashed rgba(200,163,95,.35);
+  border-radius:14px;background:linear-gradient(180deg,rgba(19,29,39,.6),rgba(14,21,29,.6));overflow:hidden}
+.sealed::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(500px 200px at 50% 0%,rgba(91,131,151,.12),transparent 70%);pointer-events:none}
+.talisman{width:110px;height:110px;margin:0 auto 26px;border-radius:50%;position:relative;
+  border:1px solid rgba(200,163,95,.4);display:flex;align-items:center;justify-content:center;
+  animation:spin 24s linear infinite}
+.talisman::before{content:"";position:absolute;inset:9px;border-radius:50%;border:1px dashed rgba(200,163,95,.35)}
+.talisman::after{content:"";position:absolute;inset:20px;border-radius:50%;border:1px solid rgba(179,64,46,.4)}
+.talisman .fu{font-family:var(--font-kai);font-size:40px;color:var(--gold-hi);animation:spin 24s linear infinite reverse;
+  text-shadow:0 0 18px rgba(200,163,95,.5)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sealed h3{font-family:var(--font-kai);font-size:24px;letter-spacing:8px;color:var(--gold);margin-bottom:12px}
+.sealed p{color:var(--dim);font-size:14px;letter-spacing:2px;max-width:520px;margin:0 auto}
+.sealed .hint{margin-top:22px;font-size:12px;color:var(--faint);letter-spacing:3px}
+
+/* ===== 页脚 ===== */
+footer{position:relative;z-index:2;text-align:center;padding:70px 20px 50px;color:var(--faint)}
+footer .fin{font-family:var(--font-kai);font-size:20px;letter-spacing:10px;color:var(--gold);margin-bottom:12px}
+footer .motto{font-family:var(--font-kai);letter-spacing:4px;color:var(--dim);font-size:14px}
+footer .src{margin-top:26px;font-size:11.5px;letter-spacing:1px;line-height:2}
+footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;transform:rotate(3deg);
+  background:linear-gradient(135deg,#c0503a,#8e2f1f);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-kai);color:#f7ecd9;font-size:15px;letter-spacing:1px;
+  box-shadow:0 3px 12px rgba(179,64,46,.4)}
+
+/* 滚动显现 */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s ease}
+.reveal.on{opacity:1;transform:none}
+
+@media (max-width:640px){
+  nav{padding:0 14px;gap:10px} nav .brand small{display:none}
+  nav .links a{padding:6px 8px;font-size:13px;letter-spacing:0}
+  .timeline{padding-left:26px}
+  .entry::before{left:-23px}
+  .month-mark::before{left:-26px}
+}
+</style>
+</head>
+<body>
+<div id="qi"></div>
+
+<nav>
+  <div class="mini-seal">仙</div>
+  <div class="brand">凡人修仙传<small>吾之仙途</small></div>
+  <div class="links">
+    <a href="#home" class="act">卷首</a>
+    <a href="#log">修行日志</a>
+    <a href="#food">灵膳录</a>
+    <a href="#body">肉身境</a>
+  </div>
+</nav>
+
+<!-- ============ 卷首 ============ -->
+<header id="home">
+  <div class="hero-glow"></div>
+  <div class="h-title reveal">凡人修仙传</div>
+  <div class="h-sub reveal">吾 之 仙 途</div>
+  <div class="h-era reveal">凡人之躯 · 亦可行仙路 —— <b>乙巳年</b> 起 · <b>丙午年</b> 续</div>
+  <div class="seal reveal"><span>吾</span><span>之</span><span>仙</span><span>途</span></div>
+
+  <div class="jade reveal" id="jadeStats"></div>
+
+  <div class="realm reveal">
+    <div class="path" id="realmPath"></div>
+    <div class="rbar"><i id="rbarFill"></i></div>
+    <div class="rnote" id="rbarNote"></div>
+  </div>
+
+  <svg class="mountain" viewBox="0 0 1440 300" preserveAspectRatio="none">
+    <path d="M0,300 L0,190 Q160,90 330,170 Q420,205 560,150 Q700,95 840,175 Q950,235 1100,160 Q1230,95 1330,175 L1440,150 L1440,300 Z" fill="rgba(46,70,84,.45)"/>
+    <path d="M0,300 L0,235 Q200,160 400,225 Q560,275 720,215 Q900,150 1060,230 Q1220,290 1330,235 L1440,215 L1440,300 Z" fill="rgba(30,49,60,.65)"/>
+    <path d="M0,300 L0,268 Q240,225 480,265 Q720,300 960,262 Q1200,225 1440,268 L1440,300 Z" fill="rgba(16,26,34,.9)"/>
+  </svg>
+  <div class="scroll-hint">展 卷 ▾</div>
+</header>
+
+<!-- ============ 卷一 · 修行日志 ============ -->
+<section id="log">
+  <div class="chapter-head reveal">
+    <span class="no">卷一</span><h2>修行日志</h2><span class="en">MORTAL'S JOURNEY · DAILY PRACTICE</span>
+  </div>
+  <p class="chapter-desc reveal">以凡人之躯，记录红尘历练。每一日皆是修行，每一餐皆是机缘。<b id="logDescN"></b></p>
+  <div class="log-tools reveal">
+    <div class="chip on" data-year="all">全部</div>
+    <div class="chip" data-year="2025">乙巳 · 炼气期</div>
+    <div class="chip" data-year="2026">丙午 · 筑基期</div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c8a35f" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="logSearch" type="text" placeholder="以神识探查往事…（事件 / 灵膳 / 日期）">
+    </div>
+    <span class="count-note" id="logCount"></span>
+  </div>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<!-- ============ 卷二 · 灵膳录 ============ -->
+<section id="food">
+  <div class="chapter-head reveal">
+    <span class="no">卷二</span><h2>灵膳录</h2><span class="en">SPIRIT FEAST · FOOD ATLAS</span>
+  </div>
+  <p class="chapter-desc reveal">坊市之间，凡尘烟火最抚仙心。此录收录<b id="foodDescN"></b>，另有机缘后备若干。</p>
+  <div class="food-tabs reveal" id="foodTabs"></div>
+  <div class="food-tools reveal">
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c8a35f" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="foodSearch" type="text" placeholder="探查仙府名号…">
+    </div>
+    <span class="count-note" id="foodCount"></span>
+  </div>
+  <div class="food-grid" id="foodGrid"></div>
+</section>
+
+<!-- ============ 卷三 · 肉身境 ============ -->
+<section id="body">
+  <div class="chapter-head reveal">
+    <span class="no">卷三</span><h2>肉身境</h2><span class="en">BODY REALM · SEALED</span>
+  </div>
+  <p class="chapter-desc reveal">皮囊亦是道器，气血自有乾坤。</p>
+  <div class="sealed reveal">
+    <div class="talisman"><span class="fu">封</span></div>
+    <h3>此卷尚在封印之中</h3>
+    <p>肉身之境，蕴藏周天气血、经脉流转与禁忌诸事。<br>待道友参悟自身，此封自解，届时录入其中。</p>
+    <div class="hint">—— 封印之法，静候其人 ——</div>
+  </div>
+</section>
+
+<footer>
+  <div class="fin">卷 终</div>
+  <div class="motto">大道三千 · 吾只取一瓢饮</div>
+  <div class="mini-seal2">仙途</div>
+  <div class="src">数据源：人生日志（2025–2026）· 武汉美食地图（探店版）<br>凡人修仙传 · 吾之仙途 —— 记于红尘</div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+(function(){
+'use strict';
+var D = window.XIUXIAN_DATA || {logs:[],eaten:[],backup:[]};
+var logs = D.logs || [], eaten = D.eaten || [], backup = D.backup || [];
+
+/* ---------- 灵气粒子 ---------- */
+(function(){
+  var box = document.getElementById('qi'), n = 14;
+  for(var i=0;i<n;i++){
+    var s = document.createElement('span');
+    var sz = 1.5 + Math.random()*3;
+    s.style.width = s.style.height = sz+'px';
+    s.style.left = (Math.random()*100)+'%';
+    s.style.setProperty('--dx',(Math.random()*120-60)+'px');
+    s.style.setProperty('--o',(0.15+Math.random()*0.4).toFixed(2));
+    s.style.animationDuration = (14+Math.random()*22)+'s';
+    s.style.animationDelay = (-Math.random()*30)+'s';
+    box.appendChild(s);
+  }
+})();
+
+/* ---------- 工具 ---------- */
+function $(s){return document.querySelector(s)}
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
+function esc(t){var d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
+var WD=['日','一','二','三','四','五','六'];
+var GANZHI={'2025':'乙巳','2026':'丙午'};
+function fmtDate(d){
+  var p=d.split('-');return {y:p[0],m:+p[1],day:+p[2],
+    text:p[0]+'年'+p[1]+'月'+p[2]+'日', wd:'星期'+WD[new Date(+p[0],+p[1]-1,+p[2]).getDay()]}
+}
+
+/* ---------- 卷首统计 ---------- */
+var nFoodLog=0, nEmpty=0, nEv=0;
+logs.forEach(function(l){ if(l.f&&l.f.length)nFoodLog++; if(l.e)nEv++; else nEmpty++; });
+(function(){
+  var box=$('#jadeStats');
+  var items=[
+    ['修行日志', logs.length+' 篇', '红尘历练 · 逐日记录'],
+    ['有字之日', nEv+' 日', '余 '+nEmpty+' 日闭关未着一字'],
+    ['灵膳入录', nFoodLog+' 席', '一饮一啄 · 皆有前定'],
+    ['探店仙府', (eaten.length+backup.length)+' 家', '已尝 '+eaten.length+' · 后备 '+backup.length]
+  ];
+  box.innerHTML=items.map(function(it){
+    return '<div class="card"><div class="num">'+it[1]+'</div><div class="lab">'+it[0]+'</div><div class="tip">'+it[2]+'</div></div>';
+  }).join('');
+  $('#logDescN').textContent='凡两载修行，共 '+logs.length+' 篇日志。';
+  $('#foodDescN').textContent='曾亲临之仙府 '+eaten.length+' 家';
+})();
+
+/* ---------- 境界阶梯 ---------- */
+(function(){
+  var years={}, last=null;
+  logs.forEach(function(l){var y=l.d.slice(0,4); years[y]=true; if(!last||l.d>last)last=l.d});
+  var ys=Object.keys(years).sort();
+  var stages=[{r:'炼气期',y:'乙巳 2025',cls:ys.indexOf('2025')>=0?'pass':''},
+              {r:'筑基期',y:'丙午 2026',cls:'pass now'},
+              {r:'结丹期',y:'封印中',cls:''},
+              {r:'元婴期',y:'封印中',cls:''}];
+  var html='';
+  stages.forEach(function(s,i){
+    if(i>0)html+='<div class="seg'+(i<=1?' lit':'')+'"></div>';
+    html+='<div class="stage '+s.cls+'"><div class="dot"></div><div class="rname">'+s.r+'</div><div class="yr">'+s.y+'</div></div>';
+  });
+  $('#realmPath').innerHTML=html;
+  var pct=ys.length>1?Math.min(100,Math.round((new Date(last)-new Date('2026-01-01'))/864e5/365*100)):100;
+  $('#rbarFill').style.width='0%';
+  setTimeout(function(){$('#rbarFill').style.width=Math.max(8,pct)+'%'},400);
+  $('#rbarNote').textContent='丙午年筑基 · 已历 '+pct+' 成（日志至 '+last+'）';
+})();
+
+/* ---------- 修行日志渲染 ---------- */
+var curYear='all', curQ='';
+function renderLogs(){
+  var box=$('#timeline'), html='', lastMonth='', shown=0;
+  var qs=curQ.trim().toLowerCase();
+  logs.forEach(function(l){
+    if(curYear!=='all' && l.d.slice(0,4)!==curYear)return;
+    var hay=(l.d+' '+(l.e||'')+' '+(l.f||[]).join(' ')+' '+(l.r||'')).toLowerCase();
+    if(qs && hay.indexOf(qs)<0)return;
+    var month=l.d.slice(0,7);
+    if(month!==lastMonth){
+      if(html)html+='<div class="hr-gold"></div>';
+      var cnt=logs.filter(function(x){return x.d.slice(0,7)===month}).length;
+      html+='<div class="month-mark">'+GANZHI[month.slice(0,4)]+'年 '+month.slice(5,7)+'月 <span class="mstats">此月录 '+cnt+' 篇</span></div>';
+      lastMonth=month;
+    }
+    var f=fmtDate(l.d), hasEv=!!(l.e&&l.e.trim()), hasF=l.f&&l.f.length;
+    html+='<div class="entry'+(hasEv||hasF?'':' empty')+'">'
+      +'<div class="d"><span class="date">'+f.text+'</span><span class="wd">'+f.wd+'</span>'
+      +(hasEv?'':'<span class="bigan">闭关</span>')+'</div>';
+    if(hasEv)html+='<div class="txt">'+esc(l.e)+'</div>';
+    else if(hasF)html+='<div class="txt" style="color:var(--dim)">此日未记事，唯有灵膳。</div>';
+    else html+='<div class="txt" style="color:var(--faint)">此日闭关，未着一字。</div>';
+    if(hasF)html+='<div class="foods"><span class="fl">灵膳</span>'+l.f.map(function(x){return '<span class="fchip">'+esc(x)+'</span>'}).join('')+'</div>';
+    if(l.r&&l.r.trim())html+='<div class="route">'+esc(l.r)+'</div>';
+    html+='</div>';
+    shown++;
+  });
+  box.innerHTML=html||'<div class="food-empty">神识所及 · 未见此段因果</div>';
+  $('#logCount').textContent='示 '+shown+' 篇';
+  observeReveals();
+}
+$$('.log-tools .chip').forEach(function(c){
+  c.addEventListener('click',function(){
+    $$('.log-tools .chip').forEach(function(x){x.classList.remove('on')});
+    c.classList.add('on');curYear=c.getAttribute('data-year');renderLogs();
+  });
+});
+var deb;
+$('#logSearch').addEventListener('input',function(e){curQ=e.target.value;clearTimeout(deb);deb=setTimeout(renderLogs,160)});
+
+/* ---------- 灵膳录渲染 ---------- */
+var PIN={gold:['gold','上品 · 熟客'],silver:['silver','中品 · 一晤'],fate:['fate','机缘 · 未至'],evil:['evil','凶地 · 勿入']};
+function pinOf(s){
+  if(s==='吃过多次')return PIN.gold;
+  if(s==='吃过一次')return PIN.silver;
+  if(s==='计划去吃'||s==='还没吃但想吃')return PIN.fate;
+  if(s.indexOf('避雷')>=0)return PIN.evil;
+  return PIN.silver;
+}
+var regions=['全部','武昌','汉口','汉阳','异地','未详','后备名单'];
+function regionOf(s){
+  if(s==='武昌'||s==='汉口'||s==='汉阳'||s==='异地')return s;
+  return '未详';
+}
+var curReg='全部', curFQ='';
+function shopCard(s,isBackup){
+  var p=pinOf(s.s), reg=isBackup?'后备':(s.reg||'未详');
+  var pinCls=p[0], pinTxt=isBackup?(s.s.indexOf('避雷')>=0?'凶地 · 勿入':'仙缘 · 未至'):pinTxt;
+  var border=pinCls==='gold'?' gold-b':(pinCls==='evil'?' evil-b':'');
+  var metas=[reg]; if(s.area)metas.push(s.area); if(s.t)metas.push(s.t);
+  var dateTxt=isBackup?'':'<div class="last">'+(s.date?'亲临 · '+s.date:'亲临之日未录')+'</div>';
+  return '<div class="shop'+border+'"><div class="top"><div class="name">'+esc(s.n)+'</div>'
+    +'<div class="pin '+pinCls+'">'+pinTxt+'</div></div>'
+    +'<div class="meta">'+metas.map(function(m){return '<span class="m">'+esc(m)+'</span>'}).join('')+'</div>'
+    +(s.note?'<div class="note">'+esc(s.note)+'</div>':'')
+    +dateTxt+'</div>';
+}
+function renderFood(){
+  var qs=curFQ.trim().toLowerCase();
+  var list=[], all=eaten.map(function(s){var x=s;x._bk=0;return x}).concat(backup.map(function(s){var x=s;x._bk=1;return x}));
+  all.forEach(function(s){
+    var r=s._bk?'后备名单':regionOf(s.reg);
+    if(curReg!=='全部'&&curReg!==r)return;
+    if(qs&&(s.n+' '+(s.note||'')+' '+(s.area||'')+' '+(s.t||'')).toLowerCase().indexOf(qs)<0)return;
+    list.push(s);
+  });
+  $('#foodGrid').innerHTML=list.length?list.map(function(s){return shopCard(s,s._bk)}).join('')
+    :'<div class="food-empty">此坊市中 · 未见所寻仙府</div>';
+  $('#foodCount').textContent='示 '+list.length+' 家';
+  observeReveals();
+}
+(function(){
+  var counts={};
+  var all=eaten.concat(backup);counts['全部']=all.length;
+  eaten.forEach(function(s){var r=regionOf(s.reg);counts[r]=(counts[r]||0)+1});
+  counts['后备名单']=backup.length;
+  $('#foodTabs').innerHTML=regions.map(function(r){
+    return '<div class="chip'+(r==='全部'?' on':'')+'" data-reg="'+r+'">'+r+' <span style="opacity:.6;font-size:11px">'+(counts[r]||0)+'</span></div>';
+  }).join('');
+  $$('#foodTabs .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      $$('#foodTabs .chip').forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');curReg=c.getAttribute('data-reg');renderFood();
+    });
+  });
+})();
+var deb2;
+$('#foodSearch').addEventListener('input',function(e){curFQ=e.target.value;clearTimeout(deb2);deb2=setTimeout(renderFood,160)});
+
+/* ---------- 滚动显现 & 导航高亮 ---------- */
+var io=null;
+function observeReveals(){
+  if(!('IntersectionObserver'in window)){$$('.reveal').forEach(function(el){el.classList.add('on')});return}
+  if(!io){
+    io=new IntersectionObserver(function(es){
+      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('on');io.unobserve(en.target)}});
+    },{threshold:.06});
+  }
+  $$('.reveal:not(.on)').forEach(function(el){io.observe(el)});
+}
+observeReveals();
+
+var secs=['home','log','food','body'];
+window.addEventListener('scroll',function(){
+  var cur='home';
+  secs.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<window.innerHeight*0.4)cur=id;
+  });
+  $$('nav .links a').forEach(function(a){
+    a.classList.toggle('act',a.getAttribute('href')==='#'+cur);
+  });
+},{passive:true});
+
+renderLogs();
+renderFood();
+})();
+</script>
+</body>
+</html>
