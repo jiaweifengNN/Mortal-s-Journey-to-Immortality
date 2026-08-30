@@ -183,6 +183,40 @@ tr.divider td{background:rgba(200,163,95,.06);border-bottom:1px solid rgba(200,1
 .badge.b-evil{color:#f3d9cf;background:linear-gradient(135deg,#c0503a,#8e2f1f)}
 .food-empty{color:var(--faint);text-align:center;padding:60px 0;letter-spacing:4px;font-family:var(--font-kai)}
 
+/* ===== 云游录 ===== */
+.subhead{display:flex;align-items:baseline;gap:12px;margin:34px 0 6px}
+.subhead .subno{font-family:var(--font-kai);font-size:12px;color:var(--qing);letter-spacing:3px;
+  border:1px dashed rgba(91,131,151,.5);padding:2px 8px;border-radius:4px;transform:translateY(-2px)}
+.subhead h3{font-family:var(--font-kai);font-size:20px;letter-spacing:5px;color:var(--gold);font-weight:normal}
+.subhead .suben{color:var(--faint);font-size:11px;letter-spacing:2px}
+.subdesc{color:var(--dim);font-size:13px;margin:4px 0 18px;letter-spacing:1px}
+.badge.b-buy{color:#f3e2c4;background:linear-gradient(135deg,#c0503a,#8e2f1f);box-shadow:0 0 8px rgba(179,64,46,.3)}
+.map-wrap{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px;overflow:hidden;
+  background:radial-gradient(560px 320px at 62% 34%,rgba(91,131,151,.10),transparent 70%),
+             linear-gradient(180deg,var(--ink3),var(--ink2));box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.map-wrap svg{display:block;width:100%;height:auto}
+.map-wrap .land{fill:rgba(91,131,151,.17);stroke:rgba(200,163,95,.55);stroke-width:1.1;stroke-linejoin:round}
+.map-wrap .island{fill:rgba(91,131,151,.22);stroke:rgba(200,163,95,.5);stroke-width:1;stroke-linejoin:round}
+.map-wrap .dash9{stroke:rgba(200,163,95,.6);stroke-width:1.2;stroke-dasharray:6 4}
+.map-wrap .scsdot{fill:var(--gold);opacity:.9}
+.map-wrap .scslabel{fill:var(--dim);font-size:9.5px;font-family:var(--font-kai);letter-spacing:1px}
+.map-wrap .sealabel{fill:rgba(143,160,168,.38);font-size:10px;font-family:var(--font-kai);letter-spacing:3px}
+.mapdot{cursor:pointer}
+.mapdot .halo{fill:rgba(232,205,143,.16)}
+.mapdot .core{fill:var(--gold-hi);stroke:rgba(200,163,95,.8);stroke-width:1}
+.mapdot.want .core{fill:var(--ink2);stroke:var(--cinnabar-hi);stroke-width:1.6}
+.mapdot.want .halo{fill:rgba(217,102,79,.14)}
+.mapdot .mlabel{fill:var(--gold-hi);font-size:10.5px;font-family:var(--font-kai);opacity:0;transition:.25s;
+  paint-order:stroke;stroke:#0a0e14;stroke-width:2.5px}
+.mapdot:hover .mlabel,.mapdot.home .mlabel{opacity:1}
+.map-legend{display:flex;gap:20px;flex-wrap:wrap;padding:12px 6px 0;color:var(--faint);
+  font-size:12px;letter-spacing:2px;font-family:var(--font-kai)}
+.map-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;transform:translateY(1px)}
+.map-legend .lg-went i{background:var(--gold-hi);box-shadow:0 0 6px rgba(232,205,143,.6)}
+.map-legend .lg-want i{background:none;border:2px solid var(--cinnabar-hi)}
+.map-legend .lg-home i{background:var(--gold);box-shadow:0 0 8px rgba(200,163,95,.8)}
+.map-note{color:var(--faint);font-size:11px;letter-spacing:2px;margin-top:8px}
+
 /* ===== 肉身境 ===== */
 .sealed{position:relative;text-align:center;padding:70px 20px;border:1px dashed rgba(200,163,95,.35);
   border-radius:14px;background:linear-gradient(180deg,rgba(19,29,39,.6),rgba(14,21,29,.6));overflow:hidden}
@@ -230,6 +264,7 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
     <a href="#home" class="act">卷首</a>
     <a href="#log">修行日志</a>
     <a href="#food">灵膳录</a>
+    <a href="#wander">云游录</a>
     <a href="#body">肉身境</a>
   </div>
 </nav>
@@ -299,10 +334,57 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
   </div></div>
 </section>
 
-<!-- ============ 卷三 · 肉身境 ============ -->
+<!-- ============ 卷三 · 云游录 ============ -->
+<section id="wander">
+  <div class="chapter-head reveal">
+    <span class="no">卷三</span><h2>云游录</h2><span class="en">WANDER · WISHES &amp; FOOTPRINTS</span>
+  </div>
+  <p class="chapter-desc reveal">身未动，心已远。凡人所求，不过行囊中一二件法器、舆图上三五处远方。<b id="wanderDescN"></b></p>
+
+  <!-- 其一 · 蓄宝阁 -->
+  <div class="subhead reveal"><span class="subno">其一</span><h3>蓄宝阁 · 欲购法器</h3><span class="suben">GEAR VAULT</span></div>
+  <p class="subdesc reveal">平时想买的、未来可能要买的，皆收于此阁；购得之日，移入「已购」。</p>
+  <div class="food-tabs reveal" id="wantTabs"></div>
+  <div class="food-tools reveal">
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c8a35f" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="wantSearch" type="text" placeholder="探查法器名号…（名称 / 类别 / 备注）">
+    </div>
+    <span class="count-note" id="wantCount"></span>
+  </div>
+  <div class="food-wrap reveal"><div class="food-scroll">
+    <table class="food-table"><thead id="wantHead"></thead><tbody id="wantGrid"></tbody></table>
+  </div></div>
+
+  <div class="hr-gold reveal"></div>
+
+  <!-- 其二 · 云游图 -->
+  <div class="subhead reveal"><span class="subno">其二</span><h3>云游图 · 足迹舆图</h3><span class="suben">FOOTPRINT MAP</span></div>
+  <p class="subdesc reveal">凡足之所至，皆以金珠标记；心向往之处，朱圈以待。悬停珠上可窥其名，点之可查其录。<b id="mapDescN"></b></p>
+  <div class="map-wrap reveal" id="mapBox"></div>
+  <div class="map-legend reveal">
+    <span class="lg-home"><i></i>洞府 · 武汉</span>
+    <span class="lg-went"><i></i>已至 · 足迹</span>
+    <span class="lg-want"><i></i>心向往之</span>
+  </div>
+  <p class="map-note reveal">—— 舆图为离线手绘之示意古图，非精确疆域，仅供云游追忆 ——</p>
+  <div class="food-tabs reveal" id="placeTabs" style="margin-top:22px"></div>
+  <div class="food-tools reveal">
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c8a35f" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="placeSearch" type="text" placeholder="探查去处名号…（去处 / 所在 / 见闻）">
+    </div>
+    <span class="count-note" id="placeCount"></span>
+  </div>
+  <div class="food-wrap reveal"><div class="food-scroll">
+    <table class="food-table"><thead id="placeHead"></thead><tbody id="placeGrid"></tbody></table>
+  </div></div>
+</section>
+
+<!-- ============ 卷四 · 肉身境 ============ -->
 <section id="body">
   <div class="chapter-head reveal">
-    <span class="no">卷三</span><h2>肉身境</h2><span class="en">BODY REALM · SEALED</span>
+    <span class="no">卷四</span><h2>肉身境</h2><span class="en">BODY REALM · SEALED</span>
   </div>
   <p class="chapter-desc reveal">皮囊亦是道器，气血自有乾坤。</p>
   <div class="sealed reveal">
@@ -317,7 +399,7 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
   <div class="fin">卷 终</div>
   <div class="motto">大道三千 · 吾只取一瓢饮</div>
   <div class="mini-seal2">仙途</div>
-  <div class="src">数据源：人生日志（2025–2026）· 武汉美食地图（探店版）<br>凡人修仙传 · 吾之仙途 —— 记于红尘</div>
+  <div class="src">数据源：人生日志（2025–2026）· 武汉美食地图（探店版）· 云游足迹（舆图示意）<br>凡人修仙传 · 吾之仙途 —— 记于红尘</div>
 </footer>
 
 <script src="data.js"></script>
@@ -358,12 +440,15 @@ function fmtDate(d){
 var nFoodLog=0, nEmpty=0, nEv=0;
 logs.forEach(function(l){ if(l.f&&l.f.length)nFoodLog++; if(l.e)nEv++; else nEmpty++; });
 (function(){
+  var pw=D.places||[],nWent=0,nWish=0;
+  pw.forEach(function(p){if(p.s==='心向往之')nWish++;else nWent++});
   var box=$('#jadeStats');
   var items=[
     ['修行日志', logs.length+' 篇', '红尘历练 · 逐日记录'],
     ['有字之日', nEv+' 日', '余 '+nEmpty+' 日闭关未着一字'],
     ['灵膳入录', nFoodLog+' 席', '一饮一啄 · 皆有前定'],
-    ['探店仙府', (eaten.length+backup.length)+' 家', '已尝 '+eaten.length+' · 后备 '+backup.length]
+    ['探店仙府', (eaten.length+backup.length)+' 家', '已尝 '+eaten.length+' · 后备 '+backup.length],
+    ['云游足迹', nWent+' 处', '心向往之 '+nWish+' 处']
   ];
   box.innerHTML=items.map(function(it){
     return '<div class="card"><div class="num">'+it[1]+'</div><div class="lab">'+it[0]+'</div><div class="tip">'+it[2]+'</div></div>';
@@ -566,6 +651,188 @@ function renderFood(){
 var deb2;
 $('#foodSearch').addEventListener('input',function(e){curFQ=e.target.value;clearTimeout(deb2);deb2=setTimeout(renderFood,160)});
 
+/* ---------- 卷三 · 云游录 ---------- */
+var wants=D.wants||[], places=D.places||[];
+var curWant='全部', curWQ='', curPlace='全部', curPQ='';
+
+/* ----- 其一 · 蓄宝阁（欲购清单） ----- */
+function wantBadge(s){
+  if(s==='欲购')return '<span class="badge b-buy">欲购</span>';
+  if(s==='观望')return '<span class="badge b-plan">观望</span>';
+  if(s==='已购')return '<span class="badge b-multi">已购</span>';
+  return '<span class="badge b-once">'+esc(s||'—')+'</span>';
+}
+var WORDER={'欲购':0,'观望':1,'已购':2};
+function renderWants(){
+  var qs=curWQ.trim().toLowerCase();
+  var list=wants.filter(function(w){
+    if(curWant!=='全部'&&w.s!==curWant)return false;
+    var hay=((w.n||'')+' '+(w.t||'')+' '+(w.s||'')+' '+(w.note||'')+' '+(w.date||'')).toLowerCase();
+    return !(qs&&hay.indexOf(qs)<0);
+  });
+  list.sort(function(a,b){return (WORDER[a.s]||9)-(WORDER[b.s]||9)});
+  $('#wantHead').innerHTML='<tr><th class="rownum">#</th><th>宝物</th><th>类别</th><th>状态</th><th>备注</th><th>记录之日</th></tr>';
+  var html='',no=0;
+  list.forEach(function(w){
+    no++;
+    html+='<tr>'
+      +'<td class="rownum">'+no+'</td>'
+      +'<td class="name">'+esc(w.n)+'</td>'
+      +td(w.t)
+      +'<td>'+wantBadge(w.s)+'</td>'
+      +td(w.note,'note')
+      +'<td class="date">'+(w.date||'<span class="na">—</span>')+'</td></tr>';
+  });
+  $('#wantGrid').innerHTML=html||'<tr><td colspan="6" class="food-empty">阁中暂空 · 待添法器</td></tr>';
+  $('#wantCount').textContent='示 '+list.length+' 件';
+  observeReveals();
+}
+(function(){
+  var ws=['全部','欲购','观望','已购'],cnt={};
+  wants.forEach(function(w){cnt[w.s]=(cnt[w.s]||0)+1});
+  $('#wantTabs').innerHTML=ws.map(function(s){
+    return '<div class="chip'+(s==='全部'?' on':'')+'" data-want="'+s+'">'+s
+      +' <span style="opacity:.6;font-size:11px">'+(s==='全部'?wants.length:(cnt[s]||0))+'</span></div>';
+  }).join('');
+  $$('#wantTabs .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      $$('#wantTabs .chip').forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');curWant=c.getAttribute('data-want');renderWants();
+    });
+  });
+})();
+var debW;
+$('#wantSearch').addEventListener('input',function(e){curWQ=e.target.value;clearTimeout(debW);debW=setTimeout(renderWants,160)});
+
+/* ----- 其二 · 云游图（离线示意古图） ----- */
+var MAPW=760,MAPH=618;
+function prj(ll){return [Math.round((ll[0]-72)/64*MAPW*10)/10, Math.round((55-ll[1])/52*MAPH*10)/10]}
+function pathD(pts){
+  return pts.map(function(p,i){var xy=prj(p);return (i?'L':'M')+xy[0]+' '+xy[1]}).join(' ')+' Z';
+}
+/* 大陆轮廓（经纬度锚点 · 示意） */
+var CHINA=[[73.5,39.3],[74.9,39.9],[75.9,40.5],[76.9,41.0],[78.0,41.0],[79.0,41.8],[80.2,42.5],[80.9,44.0],[82.6,45.2],[83.0,46.7],[84.9,47.0],[85.8,47.2],[86.8,48.5],[87.8,49.2],[88.9,48.1],[90.4,47.8],[91.6,45.9],[94.0,45.0],[95.4,44.3],[96.4,42.8],[98.0,42.7],[99.8,42.6],[101.8,42.5],[103.7,42.0],[104.9,41.7],[106.5,42.1],[107.7,42.5],[109.3,42.7],[110.6,43.1],[111.8,45.1],[113.5,45.5],[114.9,45.7],[116.2,46.4],[117.6,46.6],[117.8,49.5],[118.8,48.8],[119.4,50.2],[120.4,52.2],[121.3,53.3],[123.0,53.5],[124.6,53.1],[125.7,52.5],[126.5,51.4],[127.5,50.2],[128.7,49.4],[130.3,48.9],[131.6,47.7],[133.1,48.1],[134.3,48.4],[133.6,47.2],[133.1,45.6],[131.3,44.9],[131.0,43.4],[130.6,42.7],[130.4,42.3],[129.6,42.1],[128.4,41.4],[126.5,41.1],[125.0,40.8],[124.4,40.2],[123.2,39.8],[122.3,39.3],[121.2,38.7],[121.6,39.2],[122.2,40.6],[120.8,40.7],[119.7,39.9],[119.0,39.4],[117.8,39.0],[117.5,38.5],[118.9,37.8],[119.8,37.1],[120.3,37.6],[121.4,37.6],[122.1,37.5],[122.5,37.0],[121.6,36.8],[120.4,36.1],[119.9,35.8],[119.5,35.4],[119.4,34.7],[120.3,33.3],[120.2,32.4],[121.0,31.9],[121.6,31.7],[121.9,31.2],[121.2,30.4],[121.9,29.9],[122.3,30.0],[121.4,28.6],[121.0,27.9],[120.5,27.2],[119.9,26.7],[119.6,26.0],[119.8,25.4],[118.7,24.8],[118.1,24.5],[117.7,24.0],[116.7,23.3],[115.9,22.9],[114.7,22.7],[114.1,22.3],[113.5,22.2],[111.9,21.7],[110.9,21.3],[110.4,21.1],[109.6,21.4],[109.1,21.5],[107.9,21.6],[107.2,22.4],[106.0,22.8],[105.8,23.3],[104.5,22.8],[103.9,22.5],[102.9,21.8],[101.6,21.2],[100.1,21.5],[99.2,22.1],[97.7,23.9],[98.7,24.9],[98.4,25.9],[97.5,28.2],[96.4,29.0],[95.4,29.0],[94.0,27.5],[92.1,27.7],[88.9,27.3],[85.7,28.2],[84.2,28.9],[82.0,30.3],[81.0,30.4],[79.0,32.4],[78.4,34.6],[76.9,35.5],[75.8,36.6],[74.5,37.0],[73.9,38.6]];
+var TW=[[121.2,25.4],[121.9,25.0],[121.6,24.0],[121.4,22.9],[120.9,21.9],[120.6,22.4],[120.2,23.1],[120.1,23.8],[120.9,24.7]];
+var HN=[[109.2,20.0],[110.1,20.1],[111.0,19.6],[110.6,18.7],[109.6,18.2],[108.7,18.5],[108.6,19.3],[108.9,19.9]];
+/* 南海诸岛 · 断续线（示意） */
+var DASH=[[121.2,22.0,120.4,21.4],[119.6,20.2,118.8,19.1],[118.9,17.5,118.1,16.3],[118.3,14.4,117.5,13.2],[117.5,11.6,116.7,10.4],[116.2,9.6,115.2,8.6],[113.7,8.0,112.5,7.2],[110.9,6.7,109.7,6.4],[108.4,7.9,108.2,9.3],[108.5,10.6,108.9,12.0],[109.1,13.4,109.5,14.8],[108.9,16.3,109.6,17.7],[110.1,19.3,110.7,20.4]];
+var SCS=[["东沙群岛",116.7,20.6],["西沙群岛",112.0,16.5],["黄岩岛",117.8,15.1],["南沙群岛",114.0,9.9],["曾母暗沙",112.3,4.1]];
+function renderMap(){
+  var s='<svg viewBox="0 0 '+MAPW+' '+MAPH+'" role="img" aria-label="云游图 · 足迹舆图">';
+  s+='<path class="land" d="'+pathD(CHINA)+'"/>';
+  s+='<path class="island" d="'+pathD(TW)+'"/>';
+  s+='<path class="island" d="'+pathD(HN)+'"/>';
+  DASH.forEach(function(d){
+    var a=prj([d[0],d[1]]),b=prj([d[2],d[3]]);
+    s+='<line class="dash9" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>';
+  });
+  SCS.forEach(function(p){
+    var xy=prj([p[1],p[2]]);
+    s+='<circle class="scsdot" cx="'+xy[0]+'" cy="'+xy[1]+'" r="2.2"/>';
+    s+='<text class="scslabel" x="'+(xy[0]+4)+'" y="'+(xy[1]-3)+'">'+p[0]+'</text>';
+  });
+  [['渤 海',119.5,38.6],['黄 海',123.3,34.5],['东 海',124.8,28.5],['南海诸岛',111.8,13.2]].forEach(function(t){
+    var xy=prj([t[1],t[2]]);
+    s+='<text class="sealabel" x="'+xy[0]+'" y="'+xy[1]+'">'+t[0]+'</text>';
+  });
+  places.forEach(function(p){
+    if(!p.ll)return;
+    var xy=prj(p.ll), home=!!p.home, want=p.s==='心向往之';
+    var cls='mapdot'+(home?' home':'')+(want?' want':'');
+    var left=xy[0]>MAPW-120;
+    s+='<g class="'+cls+'" id="mdot-'+(p.n||'').replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g,'')+'" transform="translate('+xy[0]+','+xy[1]+')" tabindex="0">'
+      +'<title>'+esc(p.n)+(p.date?' · '+p.date:'')+(p.note?' · '+p.note:'')+'</title>'
+      +'<circle class="halo" r="'+(home?11:8)+'"/>'
+      +'<circle class="core" r="'+(home?6:4.5)+'"/>'
+      +'<text class="mlabel" x="'+(left?-8:8)+'" y="'+(home?-8:-6)+'"'+(left?' text-anchor="end"':'')+'>'+esc(p.n)+'</text></g>';
+  });
+  s+='</svg>';
+  $('#mapBox').innerHTML=s;
+  /* 点珠 → 检索其录 */
+  $$('#mapBox .mapdot').forEach(function(g){
+    g.addEventListener('click',function(){
+      var t=(g.querySelector('title')||{}).textContent||'';
+      var name=t.split(' · ')[0];
+      curPQ=name;$('#placeSearch').value=name;
+      $$('#placeTabs .chip').forEach(function(x){x.classList.remove('on')});
+      $$('#placeTabs .chip')[0].classList.add('on');curPlace='全部';
+      renderPlaces();
+    });
+  });
+}
+
+/* ----- 云游台账（已至 / 心向往之） ----- */
+function placeBadge(s){
+  if(s==='心向往之')return '<span class="badge b-plan">心向往之</span>';
+  return '<span class="badge b-once">已至</span>';
+}
+function renderPlaces(){
+  var qs=curPQ.trim().toLowerCase();
+  var went=[],wish=[];
+  places.forEach(function(p){
+    if(curPlace!=='全部'&&p.s!==curPlace)return;
+    var hay=((p.n||'')+' '+(p.reg||'')+' '+(p.s||'')+' '+(p.note||'')+' '+(p.date||'')).toLowerCase();
+    if(qs&&hay.indexOf(qs)<0)return;
+    (p.s==='心向往之'?wish:went).push(p);
+  });
+  went.sort(function(a,b){return (a.date||'')<(b.date||'')?1:(a.date||'')>(b.date||'')?-1:0});
+  wish.sort(function(a,b){return (a.date||'')<(b.date||'')?1:(a.date||'')>(b.date||'')?-1:0});
+  $('#placeHead').innerHTML='<tr><th class="rownum">#</th><th>去处</th><th>所在</th><th>状态</th><th>游历之日</th><th>仙途见闻</th></tr>';
+  var html='',no=0;
+  if(went.length){
+    html+='<tr class="divider"><td colspan="6">已至 · 足迹 <span style="opacity:.55;letter-spacing:1px;font-size:12px">（录 '+went.length+' 处）</span></td></tr>';
+    went.forEach(function(p){
+      no++;
+      html+='<tr>'
+        +'<td class="rownum">'+no+'</td>'
+        +'<td class="name">'+esc(p.n)+(p.home?'<span class="star">◈</span>':'')+'</td>'
+        +td(p.reg)
+        +'<td>'+placeBadge(p.s)+'</td>'
+        +'<td class="date">'+(p.date||'<span class="na">—</span>')+'</td>'
+        +td(p.note,'note')+'</tr>';
+    });
+  }
+  if(wish.length){
+    html+='<tr class="divider"><td colspan="6">心向往之 · 愿往 <span style="opacity:.55;letter-spacing:1px;font-size:12px">（录 '+wish.length+' 处）</span></td></tr>';
+    wish.forEach(function(p){
+      no++;
+      html+='<tr'+(p.s==='心向往之'?' class="fromlog"':'')+'>'
+        +'<td class="rownum">'+no+'</td>'
+        +'<td class="name">'+esc(p.n)+'</td>'
+        +td(p.reg)
+        +'<td>'+placeBadge(p.s)+'</td>'
+        +'<td class="date">'+(p.date||'<span class="na">—</span>')+'</td>'
+        +td(p.note,'note')+'</tr>';
+    });
+  }
+  $('#placeGrid').innerHTML=html||'<tr><td colspan="6" class="food-empty">神识所及 · 未见此段云游</td></tr>';
+  $('#placeCount').textContent='示 '+(went.length+wish.length)+' 处';
+  observeReveals();
+}
+(function(){
+  var ps=['全部','已至','心向往之'],cnt={};
+  places.forEach(function(p){cnt[p.s]=(cnt[p.s]||0)+1});
+  $('#placeTabs').innerHTML=ps.map(function(s){
+    return '<div class="chip'+(s==='全部'?' on':'')+'" data-place="'+s+'">'+s
+      +' <span style="opacity:.6;font-size:11px">'+(s==='全部'?places.length:(cnt[s]||0))+'</span></div>';
+  }).join('');
+  $$('#placeTabs .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      $$('#placeTabs .chip').forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');curPlace=c.getAttribute('data-place');renderPlaces();
+    });
+  });
+})();
+var debP;
+$('#placeSearch').addEventListener('input',function(e){curPQ=e.target.value;clearTimeout(debP);debP=setTimeout(renderPlaces,160)});
+
+(function(){
+  var nWent=0,nWish=0;
+  places.forEach(function(p){if(p.s==='心向往之')nWish++;else nWent++});
+  $('#wanderDescN').textContent='欲购法器 '+wants.length+' 件，云游足迹 '+nWent+' 处。';
+  $('#mapDescN').textContent='舆图之上，凡足至者 '+nWent+' 处，心向往者 '+nWish+' 处。';
+})();
+
 /* ---------- 滚动显现 & 导航高亮 ---------- */
 var io=null;
 function observeReveals(){
@@ -579,7 +846,7 @@ function observeReveals(){
 }
 observeReveals();
 
-var secs=['home','log','food','body'];
+var secs=['home','log','food','wander','body'];
 window.addEventListener('scroll',function(){
   var cur='home';
   secs.forEach(function(id){
@@ -593,6 +860,9 @@ window.addEventListener('scroll',function(){
 
 renderLogs();
 renderFood();
+renderWants();
+renderPlaces();
+renderMap();
 })();
 </script>
 </body>
