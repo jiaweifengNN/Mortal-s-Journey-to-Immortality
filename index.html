@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>凡人修仙传 · 吾之仙途</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23b3402e'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23f5efe0' font-family='KaiTi,serif'>仙</text></svg>">
-<script async src="https://map.qq.com/api/gljs?v=1.exp&callback=__tmapReady"></script>
+<script>window._AMapSecurityConfig={securityJsCode:"2c66b1ef058cf8b618c881de88edd58b"}</script>
 <style>
 :root{
   --ink:#0a0e14; --ink2:#0e151d; --ink3:#131d27; --ink4:#182532;
@@ -198,9 +198,9 @@ tr.rec-row td.name{color:var(--gold-hi)}
 .badge.b-buy{color:#f3e2c4;background:linear-gradient(135deg,#c0503a,#8e2f1f);box-shadow:0 0 8px rgba(179,64,46,.3)}
 .map-wrap{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;
   background:var(--ink2);box-shadow:0 8px 28px rgba(0,0,0,.3)}
-#tmap{width:100%;height:560px;border-radius:10px}
-#tmapFall{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--dim);font-size:14px;background:var(--ink2);text-align:center;padding:40px;font-family:var(--font-kai)}
-#tmapFall b{color:var(--gold-hi);font-size:16px}
+#tmap,#foodMap{width:100%;height:560px;border-radius:10px}
+#tmapFall,#foodMapFall{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--dim);font-size:14px;background:var(--ink2);text-align:center;padding:40px;font-family:var(--font-kai)}
+#tmapFall b,#foodMapFall b{color:var(--gold-hi);font-size:16px}
 .map-legend{display:flex;gap:20px;flex-wrap:wrap;padding:12px 6px 0;color:var(--faint);
   font-size:12px;letter-spacing:2px;font-family:var(--font-kai)}
 .map-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;transform:translateY(1px)}
@@ -208,6 +208,7 @@ tr.rec-row td.name{color:var(--gold-hi)}
 .map-legend .lg-want i{background:none;border:2px solid var(--cinnabar-hi)}
 .map-legend .lg-home i{background:var(--gold);box-shadow:0 0 8px rgba(200,163,95,.8)}
 .map-note{color:var(--faint);font-size:11px;letter-spacing:2px;margin-top:8px}
+#foodGrid tr.map-hl{background:rgba(200,163,95,.18);box-shadow:inset 3px 0 0 var(--gold)}
 
 /* ===== 肉身境 ===== */
 .sealed{position:relative;text-align:center;padding:70px 20px;border:1px dashed rgba(200,163,95,.35);
@@ -324,6 +325,20 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
   <div class="food-wrap reveal"><div class="food-scroll">
     <table class="food-table"><thead id="foodHead"></thead><tbody id="foodGrid"></tbody></table>
   </div></div>
+
+  <div class="hr-gold reveal"></div>
+  <div class="subhead reveal"><span class="subno">附</span><h3>膳迹舆图 · 江城寻味</h3><span class="suben">FOOD MAP</span></div>
+  <p class="subdesc reveal">已尝与后备，皆以珠点落于江城；金为已至、银为后备、荐者高悬。<b id="foodMapDescN"></b></p>
+  <div class="map-wrap reveal" id="foodMapBox">
+    <div id="foodMap"></div>
+    <div id="foodMapFall"><b>膳迹舆图未能加载</b><span>—— 寻味茫茫，后土未应 ——</span></div>
+  </div>
+  <div class="map-legend reveal">
+    <span class="lg-went"><i></i>已尝</span>
+    <span class="lg-want"><i></i>后备名单</span>
+    <span class="lg-home"><i></i>力荐</span>
+  </div>
+  <p class="map-note reveal">—— 高德地图 · 可缩放探查江城膳迹 ——</p>
 </section>
 
 <!-- ============ 卷三 · 云游录 ============ -->
@@ -708,76 +723,79 @@ function renderWants(){
 var debW;
 $('#wantSearch').addEventListener('input',function(e){curWQ=e.target.value;clearTimeout(debW);debW=setTimeout(renderWants,160)});
 
-/* ----- 其二 · 云游图（腾讯地图 · 可缩放） ----- */
-var tmapInstance=null;
+/* ----- 其二 · 云游图（高德地图 · 可缩放） ----- */
+var amapInstance=null;
 function renderMap(){
-  if(!window.TMap){ document.getElementById('tmapFall').style.display='flex'; return; }
-  if(tmapInstance)return; /* 已初始化 */
+  if(!window.AMap){ document.getElementById('tmapFall').style.display='flex'; return; }
+  if(amapInstance)return;
   try{
-    /* 准备标注数据 */
-    var geoData=[];
+    amapInstance=new AMap.Map('tmap',{center:[114.3,30.5],zoom:5,viewMode:'2D'});
     places.forEach(function(p){
       if(!p.ll)return;
-      geoData.push({
-        id:p.n||('p'+geoData.length),
-        styleId: p.home?'home':(p.s==='心向往之'?'want':'went'),
-        position:new TMap.LatLng(p.ll[1],p.ll[0]),
-        title:p.n+(p.note?' · '+p.note:'')
-      });
-    });
-
-    /* 初始化地图 */
-    tmapInstance=new TMap.Map('tmap',{
-      center:new TMap.LatLng(30.5,114.3),
-      zoom:5,
-      viewMode:'2D',
-      showControl:true
-    });
-
-    /* 自动适配标注范围 */
-    var bounds=new TMap.LatLngBounds();
-    geoData.forEach(function(g){bounds.extend(g.position)});
-    tmapInstance.fitBounds(bounds,{padding:80});
-
-    /* 标注点 */
-    new TMap.MultiMarker({
-      map:tmapInstance,
-      styles:{
-        went:new TMap.MarkerStyle({width:26,height:34,color:'#e8cd8f',anchor:{x:13,y:34}}),
-        want:new TMap.MarkerStyle({width:26,height:34,color:'#d9664f',anchor:{x:13,y:34}}),
-        home:new TMap.MarkerStyle({width:32,height:42,color:'#c8a35f',anchor:{x:16,y:42}})
-      },
-      geometries:geoData
-    });
-
-    /* 标签 */
-    new TMap.MultiLabel({
-      map:tmapInstance,
-      styles:{
-        went:new TMap.LabelStyle({color:'#e8cd8f',size:13,offset:{x:16,y:-12},strokeColor:'#0a0e14',strokeWidth:3}),
-        want:new TMap.LabelStyle({color:'#d9664f',size:13,offset:{x:16,y:-12},strokeColor:'#0a0e14',strokeWidth:3}),
-        home:new TMap.LabelStyle({color:'#c8a35f',size:14,offset:{x:18,y:-14},strokeColor:'#0a0e14',strokeWidth:3})
-      },
-      geometries:geoData.map(function(g){
-        return {id:'l'+g.id,styleId:g.styleId,position:g.position,content:g.id};
-      })
-    });
-
-    /* 点击标注 → 检索台账 */
-    tmapInstance.on('click',function(evt){
-      if(evt && evt.poi && evt.poi.id){
-        var name=evt.poi.id;
-        curPQ=name;$('#placeSearch').value=name;
+      var isHome=!!p.home,isWant=(p.s==='心向往之');
+      var color=isHome?'#c8a35f':(isWant?'#d9664f':'#e8cd8f');
+      var m=new AMap.Marker({position:[p.ll[0],p.ll[1]],title:p.n+(p.note?' · '+p.note:''),map:amapInstance});
+      m.on('click',function(){
+        curPQ=p.n;$('#placeSearch').value=p.n;
         $$('#placeTabs .chip').forEach(function(x){x.classList.remove('on')});
         $$('#placeTabs .chip')[0].classList.add('on');curPlace='全部';
         renderPlaces();
-      }
+      });
+      new AMap.Text({
+        text:p.n,position:[p.ll[0],p.ll[1]],offset:new AMap.Pixel(14,-10),
+        style:{'background-color':'transparent','border':'none','color':color,'font-size':'13px','font-family':'STKaiti,KaiTi,楷体,serif','text-shadow':'0 0 3px #0a0e14,0 0 3px #0a0e14,0 0 3px #0a0e14'},
+        map:amapInstance
+      });
     });
+    if(places.some(function(p){return p.ll})){amapInstance.setFitView();}
   }catch(e){
     console.error('地图初始化失败:',e);
     document.getElementById('tmapFall').style.display='flex';
   }
 }
+
+/* ----- 灵膳录 · 膳迹舆图（高德地图） ----- */
+var fmapInstance=null,foodInfoWin=null;
+function renderFoodMap(){
+  if(!window.AMap){ var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; return; }
+  if(fmapInstance)return;
+  try{
+    fmapInstance=new AMap.Map('foodMap',{center:[114.3,30.55],zoom:11,viewMode:'2D'});
+    foodInfoWin=new AMap.InfoWindow({offset:new AMap.Pixel(0,-32),closeWhenClickMap:true});
+    var allData=[];
+    eaten.forEach(function(e){ if(e.ll) allData.push({n:e.n||'',ll:e.ll,rec:!!e.rec,src:'eaten'}); });
+    backup.forEach(function(b){ if(b.ll) allData.push({n:b.n||'',ll:b.ll,rec:false,src:'backup'}); });
+    allData.forEach(function(d){
+      var color=d.src==='eaten'?(d.rec?'#c8a35f':'#e8cd8f'):'#d9664f';
+      var mk=new AMap.Marker({position:[d.ll[0],d.ll[1]],title:d.n,map:fmapInstance});
+      mk.on('click',function(){
+        foodInfoWin.setContent('<div style="font-family:STKaiti,KaiTi,楷体,serif;padding:4px 6px;min-width:120px"><b style="color:'+(d.rec?'#e8cd8f':color)+';font-size:14px">'+d.n+'</b><div style="color:#8fa0a8;font-size:11px;margin-top:3px">'+(d.src==='eaten'?'已尝 · 灵膳录':(d.rec?'力荐 · 后备':'后备名单'))+'</div></div>');
+        foodInfoWin.open(fmapInstance,mk.getPosition());
+        if(d.src==='eaten'){
+          curFQ=d.n;$('#foodSearch').value=d.n;
+          $$('#foodTabs .chip').forEach(function(x){x.classList.remove('on')});
+          $$('#foodTabs .chip')[0].classList.add('on');curReg='全部';
+          renderFood();
+          setTimeout(function(){
+            var rows=document.querySelectorAll('#foodGrid tr');
+            rows.forEach(function(r){r.classList.remove('map-hl')});
+            for(var i=0;i<rows.length;i++){
+              var td=rows[i].querySelector('td');
+              if(td&&td.textContent.indexOf(d.n)>=0){rows[i].classList.add('map-hl');rows[i].scrollIntoView({block:'center'});break;}
+            }
+          },100);
+        }
+      });
+    });
+    if(allData.length){fmapInstance.setFitView();}
+    var desc=$('#foodMapDescN');
+    if(desc){desc.textContent='· 共 '+allData.length+' 处 ·';}
+  }catch(e){
+    console.error('膳迹舆图初始化失败:',e);
+    var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex';
+  }
+}
+
 
 /* ----- 云游台账（已至 / 心向往之） ----- */
 function placeBadge(s){
@@ -880,12 +898,15 @@ renderLogs();
 renderFood();
 renderWants();
 renderPlaces();
-/* 地图异步初始化，不阻塞页面渲染 */
-window.__tmapReady=function(){ renderMap(); };
-/* 如果腾讯地图脚本已加载（回调已触发），直接初始化 */
-if(window.TMap){ renderMap(); }
+/* 地图异步初始化（高德），不阻塞页面渲染 */
+var __amapScript=document.createElement('script');
+__amapScript.src='https://webapi.amap.com/maps?v=2.0&key=577a95a597a1355b4099f2cfb488117d';
+__amapScript.async=true;
+__amapScript.onload=function(){ renderMap(); if(typeof renderFoodMap==='function') renderFoodMap(); };
+__amapScript.onerror=function(){ document.getElementById('tmapFall').style.display='flex'; var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; };
+document.head.appendChild(__amapScript);
 /* 超时降级：8秒后仍未加载则显示离线提示 */
-setTimeout(function(){ if(!window.TMap){ document.getElementById('tmapFall').style.display='flex'; } },8000);
+setTimeout(function(){ if(!window.AMap){ document.getElementById('tmapFall').style.display='flex'; var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; } },8000);
 })();
 </script>
 </body>
