@@ -182,6 +182,10 @@ tr.divider td{background:rgba(200,163,95,.06);border-bottom:1px solid rgba(200,1
 .badge.b-once{color:var(--moon);background:rgba(91,131,151,.22);border:1px solid rgba(91,131,151,.45)}
 .badge.b-plan{color:var(--qing);background:rgba(91,131,151,.08);border:1px dashed var(--qing)}
 .badge.b-evil{color:#f3d9cf;background:linear-gradient(135deg,#c0503a,#8e2f1f)}
+.badge-rec{display:inline-block;width:19px;height:19px;line-height:19px;text-align:center;border-radius:50%;
+  background:linear-gradient(135deg,#f0d896,#d9a938);color:#1a1208;font-size:11px;font-weight:bold;font-family:var(--font-kai);
+  margin-left:5px;vertical-align:middle;box-shadow:0 0 7px rgba(232,205,143,.55);cursor:default}
+tr.rec-row td.name{color:var(--gold-hi)}
 .food-empty{color:var(--faint);text-align:center;padding:60px 0;letter-spacing:4px;font-family:var(--font-kai)}
 
 /* ===== 云游录 ===== */
@@ -559,7 +563,8 @@ function renderFood(){
     if(showMap)backup.forEach(function(s){ if(hit(s.n,s.note,s.area,s.t,s.reg,s.s))addMap(s) });
   }else{
     if(showMap)eaten.forEach(function(s){
-      if(curReg!=='全部'&&regionOf(s.reg)!==curReg)return;
+      if(curReg==='力荐'&&!(s.rec===true))return;
+      if(curReg!=='全部'&&curReg!=='力荐'&&regionOf(s.reg)!==curReg)return;
       if(!hit(s.n,s.note,s.area,s.t,s.reg,s.s))return;
       addMap(s);
     });
@@ -572,10 +577,12 @@ function renderFood(){
   var html='', lastYear='', no=0;
   function mapRow(s){
     var multi=s.s==='吃过多次', evil=s.s&&s.s.indexOf('避雷')>=0;
-    var cls=multi?' class="multi"':(evil?' class="evil"':'');
+    var rec=s.rec===true;
+    var cls=multi?' class="multi rec-row"':(evil?' class="evil"':(rec?' class="rec-row"':''));
+    var recBadge=rec?'<span class="badge-rec" title="力荐">荐</span>':'';
     return '<tr'+cls+'>'
       +'<td class="rownum">'+(++no)+'</td>'
-      +'<td class="name">'+esc(s.n)+(multi?'<span class="star">★</span>':'')+'</td>'
+      +'<td class="name">'+esc(s.n)+recBadge+(multi?'<span class="star">★</span>':'')+'</td>'
       +td(s.t)
       +'<td>'+badge(s.s)+'</td>'
       +td(isBk?s.reg:regionOf(s.reg))
@@ -612,11 +619,17 @@ function renderFood(){
 }
 (function(){
   var counts={};
+  var recCount=eaten.filter(function(s){return s.rec===true}).length;
+  counts['力荐']=recCount;
   counts['全部']=eaten.length;
   eaten.forEach(function(s){var r=regionOf(s.reg);counts[r]=(counts[r]||0)+1});
   counts['后备名单']=backup.length;
-  $('#foodTabs').innerHTML=regions.map(function(r){
-    return '<div class="chip'+(r==='全部'?' on':'')+'" data-reg="'+r+'">'+r+' <span style="opacity:.6;font-size:11px">'+(counts[r]||0)+'</span></div>';
+  var recTabs=['力荐'].concat(regions);
+  var recClass=' style="border-color:var(--gold);color:var(--gold-hi)"';
+  $('#foodTabs').innerHTML=recTabs.map(function(r){
+    var isRec=r==='力荐';
+    var onClass=(r==='全部'?' on':'');
+    return '<div class="chip'+onClass+'" data-reg="'+r+'"'+(isRec?recClass:'')+'>'+r+' <span style="opacity:.6;font-size:11px">'+(counts[r]||0)+'</span></div>';
   }).join('');
   $$('#foodTabs .chip').forEach(function(c){
     c.addEventListener('click',function(){
