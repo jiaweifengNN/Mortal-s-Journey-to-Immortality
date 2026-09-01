@@ -729,7 +729,7 @@ function renderMap(){
   if(!window.AMap){ document.getElementById('tmapFall').style.display='flex'; return; }
   if(amapInstance)return;
   try{
-    amapInstance=new AMap.Map('tmap',{center:[114.3,30.5],zoom:5,viewMode:'2D'});
+    amapInstance=new AMap.Map('tmap',{center:[104,35],zoom:4,viewMode:'2D',mapStyle:'amap://styles/dark'});
     places.forEach(function(p){
       if(!p.ll)return;
       var isHome=!!p.home,isWant=(p.s==='心向往之');
@@ -747,7 +747,7 @@ function renderMap(){
         map:amapInstance
       });
     });
-    if(places.some(function(p){return p.ll})){amapInstance.setFitView();}
+    /* 默认显示全国全貌，用户手动缩放查看足迹细节 */
   }catch(e){
     console.error('地图初始化失败:',e);
     document.getElementById('tmapFall').style.display='flex';
@@ -760,7 +760,7 @@ function renderFoodMap(){
   if(!window.AMap){ var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; return; }
   if(fmapInstance)return;
   try{
-    fmapInstance=new AMap.Map('foodMap',{center:[114.3,30.55],zoom:11,viewMode:'2D'});
+    fmapInstance=new AMap.Map('foodMap',{center:[114.3,30.55],zoom:11,viewMode:'2D',mapStyle:'amap://styles/dark'});
     foodInfoWin=new AMap.InfoWindow({offset:new AMap.Pixel(0,-32),closeWhenClickMap:true});
     var allData=[];
     eaten.forEach(function(e){ if(e.ll) allData.push({n:e.n||'',ll:e.ll,rec:!!e.rec,src:'eaten'}); });
@@ -787,7 +787,7 @@ function renderFoodMap(){
         }
       });
     });
-    if(allData.length){fmapInstance.setFitView();}
+    /* 默认显示武汉全市，用户手动缩放查看饭店分布 */
     var desc=$('#foodMapDescN');
     if(desc){desc.textContent='· 共 '+allData.length+' 处 ·';}
   }catch(e){
