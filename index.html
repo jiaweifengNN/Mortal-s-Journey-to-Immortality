@@ -502,10 +502,13 @@ function renderLogs(){
   });
   head.innerHTML='<tr><th class="rownum">#</th><th>日期</th><th>事件</th><th>吃了什么</th><th>路线</th></tr>';
   var html='', lastMonth='', no=0;
+  /* 预统计各月份条数，避免循环内 O(n²) 重复 filter */
+  var monthCnt={};
+  list.forEach(function(x){ var m=x.d.slice(0,7); monthCnt[m]=(monthCnt[m]||0)+1; });
   list.forEach(function(l){
     var month=l.d.slice(0,7);
     if(month!==lastMonth){
-      var cnt=list.filter(function(x){return x.d.slice(0,7)===month}).length;
+      var cnt=monthCnt[month]||0;
       html+='<tr class="divider"><td colspan="5">'+(GANZHI[month.slice(0,4)]||'')+'年 '+month.slice(5,7)+'月'
         +' <span style="opacity:.55;letter-spacing:1px;font-size:12px">（录 '+cnt+' 篇）</span></td></tr>';
       lastMonth=month;
@@ -904,19 +907,52 @@ window.addEventListener('scroll',function(){
   });
 },{passive:true});
 
-renderLogs();
-renderFood();
-renderWants();
-renderPlaces();
-/* 地图异步初始化（高德），不阻塞页面渲染 */
-var __amapScript=document.createElement('script');
-__amapScript.src='https://webapi.amap.com/maps?v=2.0&key=577a95a597a1355b4099f2cfb488117d';
-__amapScript.async=true;
-__amapScript.onload=function(){ renderMap(); if(typeof renderFoodMap==='function') renderFoodMap(); };
-__amapScript.onerror=function(){ document.getElementById('tmapFall').style.display='flex'; var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; };
-document.head.appendChild(__amapScript);
-/* 超时降级：8秒后仍未加载则显示离线提示 */
-setTimeout(function(){ if(!window.AMap){ document.getElementById('tmapFall').style.display='flex'; var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; } },8000);
+/* 首屏提速：日志/灵膳/蓄宝/云游 分帧渲染，先露出页面骨架再回填内容，
+   避免一次性同步拼装 500+ 行导致的长时间白屏（慢网/手机上体验更明显） */
+requestAnimationFrame(function(){
+  renderLogs();
+  requestAnimationFrame(function(){
+    renderFood();
+    requestAnimationFrame(function(){
+      renderWants();
+      renderPlaces();
+    });
+  });
+});
+/* 高德地图懒加载：滚动到地图区域才动态拉取脚本，避免大地图库阻塞首屏日志/灵膳渲染 */
+var __mapsStarted=false;
+function __initMaps(){
+  if(__mapsStarted)return; __mapsStarted=true;
+  var __amapScript=document.createElement('script');
+  __amapScript.src='https://webapi.amap.com/maps?v=2.0&key=577a95a597a1355b4099f2cfb488117d';
+  __amapScript.async=true;
+  __amapScript.onload=function(){ try{ renderMap(); if(typeof renderFoodMap==='function') renderFoodMap(); }catch(e){console.error(e);} };
+  __amapScript.onerror=function(){ var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; document.getElementById('tmapFall').style.display='flex'; };
+  document.head.appendChild(__amapScript);
+  /* 一旦发起即开始记时降级 */
+  __mapFallTimer&&clearTimeout(__mapFallTimer);
+  __mapFallTimer=setTimeout(function(){ if(!window.AMap){ var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; document.getElementById('tmapFall').style.display='flex'; } },8000);
+}
+var __mapFallTimer=null;
+(function(){
+  var boxes=document.querySelectorAll('.map-wrap');
+  if(!boxes.length){ return; }
+  if(!('IntersectionObserver' in window) || !window.requestIdleCallback){
+    /* 简降级：稍后直接加载 */
+    __mapFallTimer=setTimeout(__initMaps,1200);
+    return;
+  }
+  if('requestIdleCallback' in window){
+    requestIdleCallback(function(){ if(!__mapsStarted && document.scrollingElement && document.scrollingElement.scrollTop===0){ /* 已在视口顶部则首屏滑动前先不急 */ } });
+  }
+  var mIo=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ __initMaps(); mIo.disconnect(); } });
+  },{rootMargin:'400px'});
+  boxes.forEach(function(b){ mIo.observe(b); });
+  /* 兜底：若用户长时间不滚动，空闲时也加载 */
+  if('requestIdleCallback' in window){ requestIdleCallback(function(){ if(!__mapsStarted){ __initMaps(); } }); }
+  else { setTimeout(function(){ if(!__mapsStarted){ __initMaps(); } },4000); }
+})();
 })();
 </script>
 </body>
