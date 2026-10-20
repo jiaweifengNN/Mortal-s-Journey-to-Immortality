@@ -204,11 +204,12 @@ tr.rec-row td.name{color:var(--gold-hi)}
   background-size:44px 44px}
 /* 底图反相压暗：高德暗色样式（amap://styles/dark）在部分网络环境下瓦片返回黑图，
    改用亮色底图 + 反相滤镜，视觉统一且不依赖样式服务可用性。
-   只作用于 canvas 图层，DOM 层的金珠与地名文字不受影响。 */
-#tmap .amap-layers,#foodMap .amap-layers{
+   只作用于 canvas 图层，DOM 层的金珠与地名文字不受影响。
+   全国图（浅色底为主）用常规反相；武汉城区图（高饱和路网/绿地）需额外提亮，否则被压成死黑。 */
+#tmap .amap-layers{
   filter:invert(.92) hue-rotate(180deg) brightness(1.25) contrast(.9) saturate(.55)}
-#tmap .amap-labels,#foodMap .amap-labels{
-  filter:invert(1) hue-rotate(180deg) brightness(1.45) contrast(.8)}
+#foodMap .amap-layers{
+  filter:invert(1) hue-rotate(180deg) brightness(1.7) contrast(.6) saturate(.4)}
 .map-hint{display:none;margin:0 0 12px;padding:11px 15px;border:1px solid rgba(217,102,79,.42);
   border-radius:10px;background:rgba(217,102,79,.07);color:#e3d5b4;font-size:13px;line-height:1.85;
   font-family:var(--font-song)}
