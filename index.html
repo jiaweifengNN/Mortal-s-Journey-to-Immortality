@@ -198,7 +198,17 @@ tr.rec-row td.name{color:var(--gold-hi)}
 .badge.b-buy{color:#f3e2c4;background:linear-gradient(135deg,#c0503a,#8e2f1f);box-shadow:0 0 8px rgba(179,64,46,.3)}
 .map-wrap{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;
   background:var(--ink2);box-shadow:0 8px 28px rgba(0,0,0,.3)}
-#tmap,#foodMap{width:100%;height:560px;border-radius:10px}
+#tmap,#foodMap{width:100%;height:560px;border-radius:10px;
+  background-color:#0b1219;
+  background-image:linear-gradient(rgba(200,163,95,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(200,163,95,.055) 1px,transparent 1px);
+  background-size:44px 44px}
+.map-hint{display:none;margin:0 0 12px;padding:11px 15px;border:1px solid rgba(217,102,79,.42);
+  border-radius:10px;background:rgba(217,102,79,.07);color:#e3d5b4;font-size:13px;line-height:1.85;
+  font-family:var(--font-song)}
+.map-hint b{color:var(--cinnabar-hi);font-family:var(--font-kai);font-size:15px;letter-spacing:1px}
+.map-hint a{color:var(--gold-hi);text-decoration:none;border-bottom:1px dashed rgba(232,205,143,.55)}
+.map-hint code{background:rgba(200,163,95,.13);padding:2px 7px;border-radius:4px;color:var(--gold-hi);
+  font-family:Consolas,"Courier New",monospace;font-size:12px}
 #tmapFall,#foodMapFall{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--dim);font-size:14px;background:var(--ink2);text-align:center;padding:40px;font-family:var(--font-kai)}
 #tmapFall b,#foodMapFall b{color:var(--gold-hi);font-size:16px}
 .map-legend{display:flex;gap:20px;flex-wrap:wrap;padding:12px 6px 0;color:var(--faint);
@@ -333,6 +343,7 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
     <div id="foodMap"></div>
     <div id="foodMapFall"><b>膳迹舆图未能加载</b><span>—— 寻味茫茫，后土未应 ——</span></div>
   </div>
+  <div class="map-hint" id="foodMapHint"></div>
   <div class="map-legend reveal">
     <span class="lg-went"><i></i>已尝</span>
     <span class="lg-want"><i></i>后备名单</span>
@@ -372,12 +383,13 @@ footer .mini-seal2{width:44px;height:44px;margin:26px auto 0;border-radius:8px;t
     <div id="tmap"></div>
     <div id="tmapFall"><b>地图未能加载（当前环境可能离线）</b><span>—— 仙途茫茫，后土未应 ——</span></div>
   </div>
+  <div class="map-hint" id="tmapHint"></div>
   <div class="map-legend reveal">
     <span class="lg-home"><i></i>洞府 · 武汉</span>
     <span class="lg-went"><i></i>已至 · 足迹</span>
     <span class="lg-want"><i></i>心向往之</span>
   </div>
-  <p class="map-note reveal">—— 腾讯地图 · 可缩放探查云游足迹 ——</p>
+  <p class="map-note reveal">—— 高德地图 · 可缩放探查云游足迹 ——</p>
   <div class="food-tabs reveal" id="placeTabs" style="margin-top:22px"></div>
   <div class="food-tools reveal">
     <div class="search">
@@ -727,12 +739,48 @@ var debW;
 $('#wantSearch').addEventListener('input',function(e){curWQ=e.target.value;clearTimeout(debW);debW=setTimeout(renderWants,160)});
 
 /* ----- 其二 · 云游图（高德地图 · 可缩放） ----- */
+/* 底图授权自检：以 file:// 直开、或域名不在高德 JS Key 白名单内时，
+   矢量瓦片会静默失败（控制台 INVALID_USER_DOMAIN），表现为「底图空白、只剩金珠」。
+   这里拦截该错误并给出可执行的解法，而不是让道友对着空白发呆。 */
+var __baseMapAuthFail=false;
+(function(){
+  var ce=console.error;
+  console.error=function(){
+    try{
+      var a=Array.prototype.slice.call(arguments).map(function(x){
+        return (x&&x.message)?x.message:String(x);
+      }).join(' ');
+      if(/INVALID_USER_DOMAIN|USERKEY_PLAT_NOMATCH|INVALID_USER_SCODE/i.test(a)){
+        __baseMapAuthFail=true; showBaseMapHint();
+      }
+    }catch(e){}
+    return ce.apply(console,arguments);
+  };
+})();
+function showBaseMapHint(){
+  var msg='<b>底图未授权</b>——当前打开方式不在高德 JS Key 的域名白名单内，'+
+    '故矢量底图为空，只余金珠标记。两条解法：<br>'+
+    '① 直接看线上版（推荐）：<a href="https://jiaweifengnn.github.io/Mortal-s-Journey-to-Immortality/" target="_blank" rel="noopener">jiaweifengnn.github.io/Mortal-s-Journey-to-Immortality</a><br>'+
+    '② 在 <code>高德开放平台 → 应用管理 → 域名白名单</code> 中补上 <code>localhost</code> 与 <code>127.0.0.1</code>，之后本地以 HTTP 方式打开即可复原。';
+  ['tmapHint','foodMapHint'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&!el.innerHTML){ el.innerHTML=msg; el.style.display='block'; }
+  });
+}
+if(location.protocol==='file:'){
+  /* file:// 无 referer 域名，必然过不了白名单，先行提示 */
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',showBaseMapHint);
+  }else{ showBaseMapHint(); }
+}
 var amapInstance=null;
 function renderMap(){
   if(!window.AMap){ document.getElementById('tmapFall').style.display='flex'; return; }
   if(amapInstance)return;
   try{
-    amapInstance=new AMap.Map('tmap',{center:[104,35],zoom:4,viewMode:'2D'});
+    amapInstance=new AMap.Map('tmap',{center:[104,35],zoom:4,viewMode:'2D',
+      mapStyle:'amap://styles/dark', showLabel:true});
+    var textLayers=[];
     places.forEach(function(p){
       if(!p.ll)return;
       var isHome=!!p.home,isWant=(p.s==='心向往之');
@@ -749,12 +797,42 @@ function renderMap(){
         $$('#placeTabs .chip')[0].classList.add('on');curPlace='全部';
         renderPlaces();
       });
-      new AMap.Text({
+      var tx=new AMap.Text({
         text:p.n,position:[p.ll[0],p.ll[1]],offset:new AMap.Pixel(14,-10),
-        style:{'background-color':'transparent','border':'none','color':(isHome?'#8a6a2f':(isWant?'#b5442f':'#6b5a2a')),'font-size':'13px','font-weight':'bold','font-family':'STKaiti,KaiTi,楷体,serif','text-shadow':'0 0 2px #fff,0 0 2px #fff,0 0 3px #fff'},
+        style:{'background-color':'transparent','border':'none','color':(isHome?'#e8cd8f':(isWant?'#f0a08c':'#f2e6c4')),'font-size':'13px','font-weight':'bold','font-family':'STKaiti,KaiTi,楷体,serif','text-shadow':'0 0 3px #0a0e14,0 0 3px #0a0e14,0 0 5px #0a0e14,0 1px 2px #000'},
         map:amapInstance
       });
+      textLayers.push({tx:tx,ll:p.ll,home:isHome,date:p.date||''});
     });
+    /* 地名防重叠：按重要度（洞府 > 有日期 > 无日期）依次占位，
+       与已显示标签的像素框相交者隐藏，缩放时自动重排 */
+    function declutter(){
+      if(!amapInstance)return;
+      var zoom=amapInstance.getZoom();
+      var boxes=[];
+      var order=textLayers.slice().sort(function(a,b){
+        if(a.home!==b.home)return a.home?-1:1;
+        if(a.date!==b.date)return a.date<b.date?1:-1;
+        return 0;
+      });
+      order.forEach(function(L){
+        var pt=amapInstance.lngLatToContainer(new AMap.LngLat(L.ll[0],L.ll[1]));
+        if(!pt){ L.tx.show(); return; }
+        var w=Math.max(46,L.tx.getText().length*13+8),h=17;
+        var box={x:pt.x+14,y:pt.y-10,w:w,h:h};
+        var hit=false;
+        if(zoom>=4){
+          for(var i=0;i<boxes.length;i++){
+            var b=boxes[i];
+            if(box.x<b.x+b.w&&box.x+box.w>b.x&&box.y<b.y+b.h&&box.y+box.h>b.y){hit=true;break;}
+          }
+        }
+        if(hit){ L.tx.hide(); }
+        else{ L.tx.show(); boxes.push(box); }
+      });
+    }
+    amapInstance.on('zoomend',declutter);
+    setTimeout(declutter,300);
     /* 默认显示全国全貌，用户手动缩放查看足迹细节 */
   }catch(e){
     console.error('地图初始化失败:',e);
@@ -768,7 +846,8 @@ function renderFoodMap(){
   if(!window.AMap){ var fm=document.getElementById('foodMapFall'); if(fm)fm.style.display='flex'; return; }
   if(fmapInstance)return;
   try{
-    fmapInstance=new AMap.Map('foodMap',{center:[114.3,30.55],zoom:11,viewMode:'2D'});
+    fmapInstance=new AMap.Map('foodMap',{center:[114.3,30.55],zoom:11,viewMode:'2D',
+      mapStyle:'amap://styles/dark', showLabel:true});
     foodInfoWin=new AMap.InfoWindow({offset:new AMap.Pixel(0,-32),closeWhenClickMap:true});
     var allData=[];
     eaten.forEach(function(e){ if(e.ll) allData.push({n:e.n||'',ll:e.ll,rec:!!e.rec,src:'eaten'}); });
