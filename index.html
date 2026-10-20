@@ -206,8 +206,9 @@ tr.rec-row td.name{color:var(--gold-hi)}
    改用亮色底图 + 反相滤镜，视觉统一且不依赖样式服务可用性。
    只作用于 canvas 图层，DOM 层的金珠与地名文字不受影响。 */
 #tmap .amap-layers,#foodMap .amap-layers{
-  filter:invert(1) hue-rotate(180deg) brightness(.78) contrast(.92) saturate(.7)}
-#tmap .amap-labels,#foodMap .amap-labels{filter:invert(1) hue-rotate(180deg) brightness(1.5) contrast(.7)}
+  filter:invert(.92) hue-rotate(180deg) brightness(1.25) contrast(.9) saturate(.55)}
+#tmap .amap-labels,#foodMap .amap-labels{
+  filter:invert(1) hue-rotate(180deg) brightness(1.45) contrast(.8)}
 .map-hint{display:none;margin:0 0 12px;padding:11px 15px;border:1px solid rgba(217,102,79,.42);
   border-radius:10px;background:rgba(217,102,79,.07);color:#e3d5b4;font-size:13px;line-height:1.85;
   font-family:var(--font-song)}
@@ -805,7 +806,7 @@ function renderMap(){
       });
       var tx=new AMap.Text({
         text:p.n,position:[p.ll[0],p.ll[1]],offset:new AMap.Pixel(14,-10),
-        style:{'background-color':'transparent','border':'none','color':(isHome?'#e8cd8f':(isWant?'#f0a08c':'#f2e6c4')),'font-size':'13px','font-weight':'bold','font-family':'STKaiti,KaiTi,楷体,serif','text-shadow':'0 0 3px #0a0e14,0 0 3px #0a0e14,0 0 5px #0a0e14,0 1px 2px #000'},
+        style:{'background-color':'transparent','border':'none','color':(isHome?'#f5dfa0':(isWant?'#f0a08c':'#f2e6c4')),'font-size':'13px','font-weight':'bold','font-family':'STKaiti,KaiTi,楷体,serif','text-shadow':'0 0 3px #0a0e14,0 0 3px #0a0e14,0 0 5px #0a0e14,0 1px 2px #000'},
         map:amapInstance
       });
       textLayers.push({tx:tx,ll:p.ll,home:isHome,date:p.date||''});
